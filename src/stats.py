@@ -56,11 +56,39 @@ def calculate_headshot_percentage(death_events):
 
 
 
+def find_primary_weapon_used(death_events):
+    my_kills = []
+    weapon_kill_tracker = {}
+
+    for event in death_events:
+        if event["attacker"] == "Cereal":
+            my_kills.append(event)
+
+    for kill in my_kills:
+        weapon_kill_tracker[kill["weapon_used"]] = weapon_kill_tracker.get(kill["weapon_used"], 0) + 1
+
+    sorted_weapon_kill_tracker = dict(sorted(weapon_kill_tracker.items(), key=lambda item: item[1], reverse=True))
+
+    primary_weapon = ""
+    kills_with_primary_weapon = 0
+
+    for index, weapon in enumerate(sorted_weapon_kill_tracker):
+        print(index)
+        if index == 0:
+            primary_weapon = weapon
+            kills_with_primary_weapon = sorted_weapon_kill_tracker[weapon]
+    
+    return {"primary_weapon": primary_weapon, "kills_with_primary_weapon": kills_with_primary_weapon}
+
+
+
 kda = calculate_kda(death_events)
 headshot_percentage = calculate_headshot_percentage(death_events)
+primary_weapon = find_primary_weapon_used(death_events)
 
 print(f'Stats from Previous Game: \n')
 print(f'KD: {kda["kd"]}')
 print(f'KDA: {kda["kda"]}')
-print(f'Headshot Percentage: {headshot_percentage}\n')
+print(f'Headshot Percentage: {headshot_percentage}')
+print(f'Primary Weapon: {primary_weapon["primary_weapon"]} with {primary_weapon["kills_with_primary_weapon"]} kills\n')
 

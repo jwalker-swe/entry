@@ -1,0 +1,30 @@
+# Virtual environment
+.venv/
+
+# Database (contains personal match data)
+*.db 
+
+# Demo files (large binary files, no point tracking these)
+*.dem 
+demos/
+
+# Radar map images (downloadable assets, not source code)
+assets/maps/
+
+# Python cache
+__pycace__/ 
+*.pyc 
+*.pyo 
+*.pyd 
+*.pytest_cache/
+
+# OS files
+.DS_Store
+Thumbs.db 
+
+# Editor/IDE
+.vscode/ 
+.idea/
+
+# Logs
+*.log 

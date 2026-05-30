@@ -30,8 +30,11 @@ def calculate_kda(death_events):
 
     my_kda: float = (len(my_kills) + len(my_assists)) / len(my_deaths)
     my_kda = round(my_kda, 2)
+    total_kills = len(my_kills)
+    total_deaths = len(my_deaths)
+    total_assists = len(my_assists)
 
-    return {"kd": my_kd, "kda": my_kda}
+    return {"kd": my_kd, "kda": my_kda, "kills": total_kills, "deaths": total_deaths, "assists": total_assists}
 
 
 
@@ -73,22 +76,24 @@ def find_primary_weapon_used(death_events):
     kills_with_primary_weapon = 0
 
     for index, weapon in enumerate(sorted_weapon_kill_tracker):
-        print(index)
         if index == 0:
             primary_weapon = weapon
             kills_with_primary_weapon = sorted_weapon_kill_tracker[weapon]
+
+    percentage_of_kills_with_primary_weapon = (kills_with_primary_weapon / len(my_kills)) * 100
     
-    return {"primary_weapon": primary_weapon, "kills_with_primary_weapon": kills_with_primary_weapon}
-
-
+    return {"primary_weapon": primary_weapon, "kills_with_primary_weapon": kills_with_primary_weapon, "percentage_of_kills_with_primary_weapon": percentage_of_kills_with_primary_weapon}
 
 kda = calculate_kda(death_events)
 headshot_percentage = calculate_headshot_percentage(death_events)
 primary_weapon = find_primary_weapon_used(death_events)
 
 print(f'Stats from Previous Game: \n')
+print(f'Kills: {kda["kills"]}')
+print(f'Deaths: {kda["deaths"]}')
+print(f'Assists: {kda['assists']}')
 print(f'KD: {kda["kd"]}')
 print(f'KDA: {kda["kda"]}')
 print(f'Headshot Percentage: {headshot_percentage}')
-print(f'Primary Weapon: {primary_weapon["primary_weapon"]} with {primary_weapon["kills_with_primary_weapon"]} kills\n')
+print(f'{primary_weapon['percentage_of_kills_with_primary_weapon']}% of your kills this game were using the {primary_weapon["primary_weapon"]} with {primary_weapon["kills_with_primary_weapon"]} kills coming from it.\n')
 

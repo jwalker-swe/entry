@@ -25,7 +25,7 @@ A personal CS2 statistics tracker that parses match demo files to extract and vi
 
 | Module | Status |
 |---|---|
-| `parser.py` | Not started |
+| `parser.py` | In progress |
 | `stats.py` | In progress |
 | `db.py` | Not started |
 | `watcher.py` | Not started |

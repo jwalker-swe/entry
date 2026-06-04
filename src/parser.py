@@ -1,5 +1,6 @@
 from typing import TypedDict, NotRequired
 from demoparser2 import DemoParser
+from pathlib import Path  
 import pandas as pd 
 import os
 
@@ -25,7 +26,7 @@ class RoundStats(TypedDict):
     dmg_dealt: NotRequired[float]
     dmg_received: NotRequired[float]
 
-demo_paths: str = "/home/jordan/workspace/jwalker/entry/demos/match730_003822397632173572324_1715874826_404.dem"
+demo_directory: str = os.getenv("DEMO_DIRECTORY")
 parser = DemoParser(demo_paths)
 
 

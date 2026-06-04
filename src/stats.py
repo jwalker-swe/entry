@@ -38,7 +38,7 @@ def calculate_kda(death_events):
 
 
 
-def calculate_headshot_percentage(death_events):
+def calculate_hs_percentage(death_events):
     my_kills = []
     headshot_total = []
 
@@ -56,6 +56,13 @@ def calculate_headshot_percentage(death_events):
     headshot_percentage = round(headshot_percentage, 2) * 100
 
     return headshot_percentage
+
+
+
+def calc_adr(death_events):
+    total_rounds = -1;
+    for event in death_events:
+        print(event)
 
 
 
@@ -85,10 +92,11 @@ def find_primary_weapon_used(death_events):
     return {"primary_weapon": primary_weapon, "kills_with_primary_weapon": kills_with_primary_weapon, "percentage_of_kills_with_primary_weapon": percentage_of_kills_with_primary_weapon}
 
 kda = calculate_kda(death_events)
-headshot_percentage = calculate_headshot_percentage(death_events)
+headshot_percentage = calculate_hs_percentage(death_events)
 primary_weapon = find_primary_weapon_used(death_events)
 
-print(f'Stats from Previous Game: \n')
+pPRINT(F'STATS FROM PREVIOUS GAME: \N')
+rint(f'Stats from Previous Game: \n')
 print(f'Kills: {kda["kills"]}')
 print(f'Deaths: {kda["deaths"]}')
 print(f'Assists: {kda['assists']}')

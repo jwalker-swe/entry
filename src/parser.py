@@ -52,17 +52,17 @@ def get_map_name(parser) -> str:
 
 def get_death_events(parser):
     # Create data frame based on player_death events and filter based on if a specific user was involved in the event
-    df = parser.parse_event("player_death", player=["X", "Y", "Z", "last_place_name", "team_name", "total_rounds_played", "round_freeze_end"])
-    filtered_df = df.loc[(df["attacker_name"] == "Cereal") | (df["user_name"] == "Cereal") | (df["assister_name"] == "Cereal")]
+    df = parser.parse_event("player_death", player=["X", "Y", "Z", "last_place_name", "team_name", "total_rounds_played", "round_freeze_end", "hitgroup"])
+    #filtered_df = df.loc[(df["attacker_name"] == "Cereal") | (df["user_name"] == "Cereal") | (df["assister_name"] == "Cereal")]
     #print(f'Filtered data frame: {filtered_df}')
 
     # Iterate over each row in the filtered data frame and create a list of dictionaries with the key value pairs listed below
     my_kda_events: list[RoundStats] = []
     total_rounds = 1
 
-    for row in filtered_df.itertuples():
-        if row.total_rounds_played > total_rounds:
-            total_rounds = row.total_rounds_played
+    for row in df.itertuples():
+        if row.total_rounds_played + 1 > total_rounds:
+            total_rounds = row.total_rounds_played + 1
 
 
         currentRound = {
@@ -82,8 +82,11 @@ def get_death_events(parser):
                 "weapon_used": row.weapon,
                 "kill_distance": row.distance,
                 "headshot": row.headshot,
+                "hit_group": row.hitgroup,
                 "dmg_dealt": row.dmg_armor + row.dmg_health if row.attacker_name == "Cereal" else None,
                 "dmg_received": row.dmg_armor + row.dmg_health if row.user_name == "Cereal" else None,
+                "tick": row.tick,
+                "demo_id": None,
             }
     
         my_kda_events.append(currentRound)
@@ -99,15 +102,17 @@ def main():
     scan_directory(demo_directory)
     paths_to_demos = get_path_to_demos(demo_directory)
     per_match_player_death_events = []
-    map_names = []
+    map_info = []
     
     for index, path in enumerate(paths_to_demos):
         parser = DemoParser(path)
 
-        map_names.append(get_map_name(parser))
+        map_info.append({"map_name": get_map_name(parser), "demo_id": path.split("/")[-1].split(".")[0]})
+        #demo_id = map_info[index]["demo_path"].split("/")[-1].split(".")[0]
         death_events = get_death_events(parser)
         for event in death_events:
-            event["map_name"] = map_names[index]
+            event["map_name"] = map_info[index]["map_name"]
+            event["demo_id"] = map_info[index]["demo_id"]
 
         per_match_player_death_events.append(death_events)
         
@@ -115,9 +120,26 @@ def main():
     #print(f'Map Names: {map_info}')
     #print(f'Player Death Events: {player_death_events}')
     for index, match in enumerate(per_match_player_death_events):
+        print(f'Demo ID: {map_info[index]["demo_id"]}')
+        print(f'Map Name: {map_info[index]["map_name"]}')
         print(f'Round Num: {match[index]["total_rounds_played"]}\n')
+        for event in match:
+            print(f'Round Event Took Place: {event["round_num"]}')
+            print(f'Attacker: {event["attacker_name"]}')
+            print(f'Attacked: {event["attacked_name"]}')
+            print(f'Assister: {event["assister_name"]}')
+            print(f'Body Part Hit: {event["hit_group"]}')
+            print(f'Headshot: {event["headshot"]}')
+            print(f'Weapon Used: {event["weapon_used"]}')
+            print(f'Damage Dealt: {event["dmg_dealt"]}')
+            print(f'Kill Distance: {event["kill_distance"]}')
+            print(f'Kill From: {event["attacker_last_place_name"]}')
+            print(f'Killed At: {event["attacked_last_place_name"]}')
+            print(f'Tick: {event["tick"]}')
+            print(f'Demo ID: {event["demo_id"]}\n')
 
 
+    
 
 main()
 

@@ -1,13 +1,15 @@
 from pathlib import Path 
+from dotenv import load_dotenv
 import bz2
 import os
 
-demo_directory = os.getenv("DEMO_DIRECTORY")
+load_dotenv()
 
+demo_directory = Path(os.getenv("DEMO_DIRECTORY"))
 
 def scan_directory(demo_directory):
 
-    print(f'Scanning {demo_directory} for .dem.bz2 files')
+    print(f'Scanning {demo_directory} for .dem.bz2 files\n')
 
     try:
 
@@ -22,9 +24,9 @@ def scan_directory(demo_directory):
             with open(decompressed_file, 'wb') as file_out:
                 file_out.write(file_content)
 
-            print(f'{file} successfully decompressed to {decompressed_file}')
+            print(f'{file} successfully decompressed to {decompressed_file}\n')
 
-        print(f'All files decompressed successfully')
+        print(f'All files decompressed successfully\n')
         
         for file in demo_directory.glob("*.dem.bz2"):
             if file.is_file():
@@ -44,17 +46,20 @@ def scan_directory(demo_directory):
 
 def get_path_to_demos(demo_directory):
 
-    print(f'Fetching paths to demo files...')
+    print(f'Fetching paths to demo files...\n')
 
     demo_paths = []
 
     try:
 
         for file in demo_directory.glob('*.dem'):
-            print(file)
-            demo_paths.append(file)
+            demo_paths.append(str(file))
 
-        print(f'Demos fetched: {demo_paths}')
+        print(f'Demos fetched: ')
+        for demo in demo_paths:
+            print(demo)
+
+        print(f'\n')
 
         return demo_paths
 
@@ -64,6 +69,6 @@ def get_path_to_demos(demo_directory):
 
 
         
-scan_directory(demo_directory)
-get_path_to_demos(demo_directory)
+#scan_directory(demo_directory)
+#get_path_to_demos(demo_directory)
 

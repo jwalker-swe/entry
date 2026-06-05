@@ -1,12 +1,17 @@
 from typing import TypedDict, NotRequired
 from demoparser2 import DemoParser
+from watcher import get_path_to_demos, scan_directory 
+from dotenv import load_dotenv
 from pathlib import Path  
 import pandas as pd 
 import os
 
+load_dotenv()
+
 class Position(TypedDict):
     x_position: float | None
     y_position: float | None
+    z_position: float | None
 
 class RoundStats(TypedDict):
     round_num: int | None
@@ -26,33 +31,20 @@ class RoundStats(TypedDict):
     dmg_dealt: NotRequired[float]
     dmg_received: NotRequired[float]
 
-demo_directory: str = os.getenv("DEMO_DIRECTORY")
-parser = DemoParser(demo_paths)
+demo_directory: str = Path(os.getenv("DEMO_DIRECTORY"))
+#print(f'Demo Directory: {demo_directory}')
+#parser = DemoParser(demo_paths)
 
-
-# With these set option, you can run python3/parser.py | less -S to view entire data frame.
-# Otherwise, can comment these options out.
-# pd.set_option('display.max_rows', None)
-# pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_colwidth', None)
-
-def calculate_position_on_map(game_x_pos, game_y_pos, x_pos, y_pos) -> dict[float, float]:
-    pixel_x = (game_x - pos_x) / scale
-    pixel_y = (game_y - pos_y) / (scale * -1)
-
-    pixel_cordinates: {
-            x_cord: pixel_x,
-            y_cord: pixel_y
-        };
-
-    return pixel_cordinates
-
+#With these set option, you can run python3/parser.py | less -S to view entire data frame.
+#Otherwise, can comment these options out.
+#pd.set_option('display.max_rows', None)
+#pd.set_option('display.max_columns', None)
+#pd.set_option('display.max_colwidth', None)
 
 
 def get_map_name(parser) -> str:
     df = parser.parse_header()
     map_name: str = df["map_name"]
-
 
     return map_name
 
@@ -60,37 +52,72 @@ def get_map_name(parser) -> str:
 
 def get_death_events(parser):
     # Create data frame based on player_death events and filter based on if a specific user was involved in the event
-    df = parser.parse_event("player_death", player=["X", "Y", "last_place_name", "team_name", "total_rounds_played", "round"])
+    df = parser.parse_event("player_death", player=["X", "Y", "Z", "last_place_name", "team_name", "total_rounds_played", "round_freeze_end"])
     filtered_df = df.loc[(df["attacker_name"] == "Cereal") | (df["user_name"] == "Cereal") | (df["assister_name"] == "Cereal")]
+    #print(f'Filtered data frame: {filtered_df}')
 
     # Iterate over each row in the filtered data frame and create a list of dictionaries with the key value pairs listed below
     my_kda_events: list[RoundStats] = []
+    total_rounds = 1
 
     for row in filtered_df.itertuples():
+        if row.total_rounds_played > total_rounds:
+            total_rounds = row.total_rounds_played
+
+
         currentRound = {
-                "round_num": row.total_rounds_played,
-                "attacker": row.attacker_name,
-                "attacked": row.user_name,
-                "weapon_used": row.weapon,
-                "attacker_pos": {row.attacker_X, row.attacker_Y},
-                "attacker_last_place_name": row.attacker_last_place_name,
+                "round_num": row.total_rounds_played + 1,
+                "attacker_name": row.attacker_name,
+                "attacked_name": row.user_name,
+                "assister_name": row.assister_name,
                 "attacker_team_name": row.attacker_team_name,
-                "attacked_pos": {row.user_X, row.user_Y},
+                "attacked_team_name": row.user_team_name,
+                "assister_team_name": row.assister_team_name,
+                "attacker_pos": {"x": row.attacker_X, "y": row.attacker_Y, "z": row.attacker_Z},
+                "attacked_pos": {"x": row.user_X, "y": row.user_Y, "z": row.user_Z},
+                "assister_pos": {"x": row.assister_X, "y": row.assister_Y, "z": row.assister_Z},
+                "attacker_last_place_name": row.attacker_last_place_name,
                 "attacked_last_place_name": row.user_last_place_name,
-                "assister": row.assister_name,
-                "assister_pos": {row.assister_X, row.assister_Y},
                 "assister_last_place_name": row.assister_last_place_name,
+                "weapon_used": row.weapon,
                 "kill_distance": row.distance,
                 "headshot": row.headshot,
                 "dmg_dealt": row.dmg_armor + row.dmg_health if row.attacker_name == "Cereal" else None,
-                "dmg_received": row.dmg_armor + row.dmg_health if row.user_name == "Cereal" else None
+                "dmg_received": row.dmg_armor + row.dmg_health if row.user_name == "Cereal" else None,
             }
     
         my_kda_events.append(currentRound)
+        for event in my_kda_events:
+            event["total_rounds_played"] = total_rounds
 
     # Return the list of dictionaries from above
     return my_kda_events
 
 
+def main():
+    # Scan demo directory for .dem.bz2 files, decompress them to .dem and return paths to each demo in a list for processing
+    scan_directory(demo_directory)
+    paths_to_demos = get_path_to_demos(demo_directory)
+    per_match_player_death_events = []
+    map_names = []
+    
+    for index, path in enumerate(paths_to_demos):
+        parser = DemoParser(path)
 
-get_death_events(parser)
+        map_names.append(get_map_name(parser))
+        death_events = get_death_events(parser)
+        for event in death_events:
+            event["map_name"] = map_names[index]
+
+        per_match_player_death_events.append(death_events)
+        
+
+    #print(f'Map Names: {map_info}')
+    #print(f'Player Death Events: {player_death_events}')
+    for index, match in enumerate(per_match_player_death_events):
+        print(f'Round Num: {match[index]["total_rounds_played"]}\n')
+
+
+
+main()
+

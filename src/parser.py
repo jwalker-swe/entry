@@ -37,9 +37,9 @@ demo_directory: str = Path(os.getenv("DEMO_DIRECTORY"))
 
 #With these set option, you can run python3/parser.py | less -S to view entire data frame.
 #Otherwise, can comment these options out.
-#pd.set_option('display.max_rows', None)
-#pd.set_option('display.max_columns', None)
-#pd.set_option('display.max_colwidth', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', None)
 
 
 def get_map_name(parser) -> str:
@@ -53,8 +53,9 @@ def get_map_name(parser) -> str:
 def get_death_events(parser):
     # Create data frame based on player_death events and filter based on if a specific user was involved in the event
     df = parser.parse_event("player_death", player=["X", "Y", "Z", "last_place_name", "team_name", "total_rounds_played", "round_freeze_end", "hitgroup"])
+    round_wins = parser.parse_event("round_end", other=["round", "winner"])
+    print(round_wins)
     #filtered_df = df.loc[(df["attacker_name"] == "Cereal") | (df["user_name"] == "Cereal") | (df["assister_name"] == "Cereal")]
-    #print(f'Filtered data frame: {filtered_df}')
 
     # Iterate over each row in the filtered data frame and create a list of dictionaries with the key value pairs listed below
     my_kda_events: list[RoundStats] = []
@@ -67,6 +68,7 @@ def get_death_events(parser):
 
         currentRound = {
                 "round_num": row.total_rounds_played + 1,
+                "round_winner": None,
                 "attacker_name": row.attacker_name,
                 "attacked_name": row.user_name,
                 "assister_name": row.assister_name,
@@ -87,6 +89,7 @@ def get_death_events(parser):
                 "dmg_received": row.dmg_armor + row.dmg_health if row.user_name == "Cereal" else None,
                 "tick": row.tick,
                 "demo_id": None,
+                "map_name": None,
             }
     
         my_kda_events.append(currentRound)
@@ -126,8 +129,14 @@ def main():
         for event in match:
             print(f'Round Event Took Place: {event["round_num"]}')
             print(f'Attacker: {event["attacker_name"]}')
+            print(f'Attacker Pos: {event["attacker_pos"]}')
+            print(f'Attacker Team: {event["attacker_team_name"]}')
             print(f'Attacked: {event["attacked_name"]}')
+            print(f'Attacked Pos: {event["attacked_pos"]}')
+            print(f'Attacked Team: {event["attacked_team_name"]}')
             print(f'Assister: {event["assister_name"]}')
+            print(f'Assister Pos: {event["assister_pos"]}')
+            print(f'Assister Team: {event["assister_team_name"]}')
             print(f'Body Part Hit: {event["hit_group"]}')
             print(f'Headshot: {event["headshot"]}')
             print(f'Weapon Used: {event["weapon_used"]}')

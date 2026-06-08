@@ -1,5 +1,6 @@
 from parser import *
 from db import get_connection, create_tables, insert_match, insert_kill_events   
+from watcher import del_uploaded_demos 
 from dotenv import load_dotenv
 from pathlib import Path 
 import pandas as pd 
@@ -16,3 +17,8 @@ for i, map in enumerate(info_to_upload[0]):
     if match_id is not None:
         print(f"Adding kda stats for {match_id}...")
         insert_kill_events(conn, match_id, info_to_upload[1][i])
+
+demo_directory: str = Path(os.getenv("DEMO_DIRECTORY"))
+
+del_uploaded_demos(demo_directory)
+

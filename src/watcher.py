@@ -68,7 +68,30 @@ def get_path_to_demos(demo_directory):
         print('Failed to fetch paths')
 
 
-        
+
+def del_uploaded_demos(demo_directory):
+    print(f'Deleting .dem files of demos that have been uploaded to db...\n')
+
+    demo_paths = []
+
+    try:
+
+        for file in demo_directory.glob('*.dem'):
+            demo_paths.append(str(file))
+
+        print(f'Deleting demo: ')
+        for demo in demo_paths:
+            if os.path.exists(demo):
+                print(demo)
+                os.remove(demo)
+
+    except:
+
+        print('Failed to find .dem files in: {demo_directory}')
+
+
+
+        print(f'\n')
 #scan_directory(demo_directory)
 #get_path_to_demos(demo_directory)
 

@@ -83,7 +83,7 @@ def insert_match(conn, demo_id: str, map_name: str, total_rounds: int) -> int | 
         return cursor.lastrowid
 
     except sqlite3.IntegrityError:
-        print(f"Match {demo_id} already in database, skipping.")
+        print(f"Match {demo_id} already in database, skipping.\n")
         return None
 
 

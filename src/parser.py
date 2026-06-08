@@ -54,7 +54,7 @@ def get_death_events(parser):
     # Create data frame based on player_death events and filter based on if a specific user was involved in the event
     df = parser.parse_event("player_death", player=["X", "Y", "Z", "last_place_name", "team_name", "total_rounds_played", "round_freeze_end", "hitgroup"])
     round_wins = parser.parse_event("round_end", other=["round", "winner"])
-    print(round_wins)
+    #print(round_wins)
     #filtered_df = df.loc[(df["attacker_name"] == "Cereal") | (df["user_name"] == "Cereal") | (df["assister_name"] == "Cereal")]
 
     # Iterate over each row in the filtered data frame and create a list of dictionaries with the key value pairs listed below
@@ -100,7 +100,7 @@ def get_death_events(parser):
     return my_kda_events
 
 
-def main():
+def get_info_to_upload():
     # Scan demo directory for .dem.bz2 files, decompress them to .dem and return paths to each demo in a list for processing
     scan_directory(demo_directory)
     paths_to_demos = get_path_to_demos(demo_directory)
@@ -108,6 +108,7 @@ def main():
     map_info = []
     
     for index, path in enumerate(paths_to_demos):
+        print(f"Parsing: {path}")
         parser = DemoParser(path)
 
         map_info.append({"map_name": get_map_name(parser), "demo_id": path.split("/")[-1].split(".")[0]})
@@ -118,37 +119,44 @@ def main():
             event["demo_id"] = map_info[index]["demo_id"]
 
         per_match_player_death_events.append(death_events)
-        
 
+        for index, match in enumerate(per_match_player_death_events):
+            if index < len(map_info):
+                map_info[index]["total_rounds_played"] = match[index]["total_rounds_played"]
+            else:
+                break
+
+    print("\n")
+        
     #print(f'Map Names: {map_info}')
     #print(f'Player Death Events: {player_death_events}')
-    for index, match in enumerate(per_match_player_death_events):
-        print(f'Demo ID: {map_info[index]["demo_id"]}')
-        print(f'Map Name: {map_info[index]["map_name"]}')
-        print(f'Round Num: {match[index]["total_rounds_played"]}\n')
-        for event in match:
-            print(f'Round Event Took Place: {event["round_num"]}')
-            print(f'Attacker: {event["attacker_name"]}')
-            print(f'Attacker Pos: {event["attacker_pos"]}')
-            print(f'Attacker Team: {event["attacker_team_name"]}')
-            print(f'Attacked: {event["attacked_name"]}')
-            print(f'Attacked Pos: {event["attacked_pos"]}')
-            print(f'Attacked Team: {event["attacked_team_name"]}')
-            print(f'Assister: {event["assister_name"]}')
-            print(f'Assister Pos: {event["assister_pos"]}')
-            print(f'Assister Team: {event["assister_team_name"]}')
-            print(f'Body Part Hit: {event["hit_group"]}')
-            print(f'Headshot: {event["headshot"]}')
-            print(f'Weapon Used: {event["weapon_used"]}')
-            print(f'Damage Dealt: {event["dmg_dealt"]}')
-            print(f'Kill Distance: {event["kill_distance"]}')
-            print(f'Kill From: {event["attacker_last_place_name"]}')
-            print(f'Killed At: {event["attacked_last_place_name"]}')
-            print(f'Tick: {event["tick"]}')
-            print(f'Demo ID: {event["demo_id"]}\n')
+    #for index, match in enumerate(per_match_player_death_events):
+        #print(f'Demo ID: {map_info[index]["demo_id"]}')
+        #print(f'Map Name: {map_info[index]["map_name"]}')
+        #print(f'Round Num: {match[index]["total_rounds_played"]}\n')
+        #for event in match:
+            #print(f'Round Event Took Place: {event["round_num"]}')
+            #print(f'Attacker: {event["attacker_name"]}')
+            #print(f'Attacker Pos: {event["attacker_pos"]}')
+            #print(f'Attacker Team: {event["attacker_team_name"]}')
+            #print(f'Attacked: {event["attacked_name"]}')
+            #print(f'Attacked Pos: {event["attacked_pos"]}')
+            #print(f'Attacked Team: {event["attacked_team_name"]}')
+            #print(f'Assister: {event["assister_name"]}')
+            #print(f'Assister Pos: {event["assister_pos"]}')
+            #print(f'Assister Team: {event["assister_team_name"]}')
+            #print(f'Body Part Hit: {event["hit_group"]}')
+            #print(f'Headshot: {event["headshot"]}')
+            #print(f'Weapon Used: {event["weapon_used"]}')
+            #print(f'Damage Dealt: {event["dmg_dealt"]}')
+            #print(f'Kill Distance: {event["kill_distance"]}')
+            #print(f'Kill From: {event["attacker_last_place_name"]}')
+            #print(f'Killed At: {event["attacked_last_place_name"]}')
+            #print(f'Tick: {event["tick"]}')
+            #print(f'Demo ID: {event["demo_id"]}\n')
+
+    return map_info, per_match_player_death_events
 
 
-    
-
-main()
+#get_info_to_upload()
 

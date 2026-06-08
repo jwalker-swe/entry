@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3 
 import os
 from pathlib import Path 
 from dotenv import load_dotenv
@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Create database file if it doesn't exist
 load_dotenv()
 
-DB_PATH = os.getenv("DB_PATH", str(PATH(__file__).parent.parent / "entry.db"))
+DB_PATH = os.getenv("DB_PATH", str(Path(__file__).parent.parent / "entry.db"))
 
 def get_connection():
     return sqlite3.connect(DB_PATH)
@@ -26,7 +26,7 @@ def create_tables(conn):
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS kill_events (
-            id INTEGER PRIMART KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             match_id INTEGER NOT NULL,
             demo_id TEXT NOT NULL,
             map_name TEXT,
@@ -46,9 +46,9 @@ def create_tables(conn):
             assister_x REAL,
             assister_y REAL,
             assister_z REAL,
-            attacker_last_place TEXT,
-            attacked_last_place TEXT,
-            assister_last_place TEXT,
+            attacker_last_place_name TEXT,
+            attacked_last_place_name TEXT,
+            assister_last_place_name TEXT,
             weapon_used TEXT,
             kill_distance REAL,
             headshot INTEGER,
@@ -67,7 +67,7 @@ def insert_match(conn, demo_id: str, map_name: str, total_rounds: int) -> int | 
 
     try:
         print("Updating Database Match Info...")
-        cursor.execute('
+        cursor.execute('''
             INSERT INTO matches (
                 demo_id,
                 map_name,
@@ -77,7 +77,7 @@ def insert_match(conn, demo_id: str, map_name: str, total_rounds: int) -> int | 
                 ?,
                 ?
             )
-        '),
+        ''', (demo_id, map_name, total_rounds))
 
         conn.commit()
         return cursor.lastrowid
@@ -97,8 +97,6 @@ def insert_kill_events(conn, match_id: int, events: list):
                 e["map_name"],
                 e["round_num"],
                 e["attacker_name"],
-                e["round_num"],
-                e["attacker_name"],
                 e["attacked_name"],
                 e["assister_name"],
                 e["attacker_team_name"],
@@ -113,9 +111,9 @@ def insert_kill_events(conn, match_id: int, events: list):
                 e["assister_pos"]["x"],
                 e["assister_pos"]["y"],
                 e["assister_pos"]["z"],
-                e["attacker_last_place"],
-                e["attacked_last_place"],
-                e["assister_last_place"],
+                e["attacker_last_place_name"],
+                e["attacked_last_place_name"],
+                e["assister_last_place_name"],
                 e["weapon_used"],
                 e["kill_distance"],
                 1 if e["headshot"] else 0,
@@ -148,9 +146,9 @@ def insert_kill_events(conn, match_id: int, events: list):
             assister_x,
             assister_y,
             assister_z,
-            attacker_last_place,
-            attacked_last_place,
-            assister_last_place,
+            attacker_last_place_name,
+            attacked_last_place_name,
+            assister_last_place_name,
             weapon_used,
             kill_distance,
             headshot,

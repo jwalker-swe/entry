@@ -1,11 +1,11 @@
 from pathlib import Path 
+from config import DEMO_DIRECTORY, PLAYER_NAME
 from dotenv import load_dotenv
 import bz2
 import os
 
-load_dotenv()
-
-demo_directory = Path(os.getenv("DEMO_DIRECTORY"))
+demo_directory = Path(DEMO_DIRECTORY)
+print(f"Demo dir: {demo_directory}")
 
 def scan_directory(demo_directory):
 

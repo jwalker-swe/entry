@@ -2,15 +2,18 @@ import sqlite3
 import os
 from pathlib import Path 
 from dotenv import load_dotenv
+from config import DB_PATH
 
 # Connect to database
 # Create database file if it doesn't exist
 load_dotenv()
 
-DB_PATH = os.getenv("DB_PATH", str(Path(__file__).parent.parent / "entry.db"))
+#DB_PATH = os.getenv("DB_PATH", str(Path(__file__).parent.parent / "entry.db"))
 
 def get_connection():
-    return sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def create_tables(conn):
     cursor = conn.cursor()

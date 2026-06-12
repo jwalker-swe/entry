@@ -3,6 +3,7 @@ from demoparser2 import DemoParser
 from watcher import get_path_to_demos, scan_directory 
 from dotenv import load_dotenv
 from pathlib import Path  
+from config import DEMO_DIRECTORY, PLAYER_NAME
 import pandas as pd 
 import os
 
@@ -31,7 +32,7 @@ class RoundStats(TypedDict):
     dmg_dealt: NotRequired[float]
     dmg_received: NotRequired[float]
 
-demo_directory: str = Path(os.getenv("DEMO_DIRECTORY"))
+demo_directory: str = Path(DEMO_DIRECTORY)
 #print(f'Demo Directory: {demo_directory}')
 #parser = DemoParser(demo_paths)
 
@@ -85,8 +86,8 @@ def get_death_events(parser):
                 "kill_distance": row.distance,
                 "headshot": row.headshot,
                 "hit_group": row.hitgroup,
-                "dmg_dealt": row.dmg_armor + row.dmg_health if row.attacker_name == "Cereal" else None,
-                "dmg_received": row.dmg_armor + row.dmg_health if row.user_name == "Cereal" else None,
+                "dmg_dealt": row.dmg_armor + row.dmg_health if row.attacker_name == PLAYER_NAME else None,
+                "dmg_received": row.dmg_armor + row.dmg_health if row.user_name == PLAYER_NAME else None,
                 "tick": row.tick,
                 "demo_id": None,
                 "map_name": None,

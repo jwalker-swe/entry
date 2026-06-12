@@ -198,6 +198,7 @@ def get_match_stats():
 
         current_adr = round((current_dmg / rounds_played), 2)
         current_match_stats = {
+            "demo_id": match["demo_id"],
             "map_name": match["map_name"],
             "adr": current_adr,
             "total_matches": COMPARE_AGAINST_LAST,

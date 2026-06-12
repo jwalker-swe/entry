@@ -1,8 +1,9 @@
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
 interface Match {
-	adr: number,
-	map_name: string
+	demo_id: string;
+	adr: number;
+	map_name: string;
 }
 
 interface AdrTrendChartProps {
@@ -12,13 +13,15 @@ interface AdrTrendChartProps {
 
 export default function AdrTrendChart({ matches, compare }: AdrTrendChartProps) {
 
-	const CustomTooltip = ({ active, payload, label }: any) => {
+	const CustomTooltip = ({ active, payload}: any) => {
 		if (active && payload && payload.length) {
+			const { map_name, adr } = payload[0].payload;
+
 			return (
 				<div className="bg-surface border border-border p-2 rounded-md shadow-lg">
-					<p className="text-text2 text-xs font-mono mb-1">{label}</p>
+					<p className="text-text2 text-xs font-mono mb-1">{map_name}</p>
 					<p className="text-text1 text-sm font-medium">
-						ADR: <span className="text-teal">{payload[0].value}</span>
+						ADR: <span className="text-teal">{adr}</span>
 					</p>
 				</div>
 			);
@@ -27,7 +30,7 @@ export default function AdrTrendChart({ matches, compare }: AdrTrendChartProps) 
 	}
 
 	const adrs = matches.map(m => m.adr);
-	const maxAdr = Math.min(...adrs);
+	const maxAdr = Math.max(...adrs);
 	const minAdr = Math.min(...adrs);
 
 
@@ -62,11 +65,14 @@ export default function AdrTrendChart({ matches, compare }: AdrTrendChartProps) 
 
 	return (
 		<div className="w-full h-full p-4 bg-cards border-1 border-border rounded-lg">
-			<p>ADR Last {compare} Games </p>
-			<ResponsiveContainer>
+			<p className="text-text3 text-md font-semibold ml-4 mb-4">
+				ADR Last {compare} Games 
+			</p>
+			<ResponsiveContainer className="w-full h-fit pb-8">
 				<BarChart data={matches} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
 					<XAxis 
-						dataKey="map_name"
+						dataKey="demo_id"
+						tickFormatter={(_, index) => matches[index]?.map_name}
 						tick={{ fill: "var(--color-text3)", fontSize: 10, fontFamily: "monospace" }}
 						axisLine={false}
 						tickLine={false}

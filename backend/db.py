@@ -23,7 +23,8 @@ def create_tables(conn):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             demo_id TEXT UNIQUE NOT NULL,
             map_name TEXT,
-            total_rounds INTEGER
+            total_rounds INTEGER,
+            match_winner TEXT
         )
     """)
 
@@ -74,13 +75,15 @@ def insert_match(conn, demo_id: str, map_name: str, total_rounds: int) -> int | 
             INSERT INTO matches (
                 demo_id,
                 map_name,
-                total_rounds
+                total_rounds,
+                match_winner,
             ) VALUES (
                 ?,
                 ?,
-                ?
+                ?,
+                ?,
             )
-        ''', (demo_id, map_name, total_rounds))
+        ''', (demo_id, map_name, total_rounds, match_winner))
 
         conn.commit()
         return cursor.lastrowid

@@ -84,7 +84,7 @@ def get_summary_stats():
         total_rounds += match["total_rounds"]
 
     kd = round(calculate_kda(kills, deaths, assists), 2)
-    hsPercentage = calculate_hsPercentage(kills, headshots)
+    hsPercentage = round(calculate_hsPercentage(kills, headshots), 2)
     adr = calculate_adr(dmg_dealt, total_rounds)
     per_match_kills = get_per_match_kills(matches, kill_event_rows)
     ast = calculate_ast(matches, per_match_kills)
@@ -105,7 +105,7 @@ def get_summary_stats():
         recent_total_rounds += match["total_rounds"]
 
     recent_kd = round(calculate_kda(recent_kills, recent_deaths, recent_assists), 2)
-    recent_hsPercentage = calculate_hsPercentage(recent_kills, recent_headshots)
+    recent_hsPercentage = round(calculate_hsPercentage(recent_kills, recent_headshots), 2)
     recent_adr = calculate_adr(recent_dmg_dealt, recent_total_rounds)
     recent_per_match_kills = get_per_match_kills(recent_matches, recent_kill_event_rows)
     recent_ast = calculate_ast(recent_matches, recent_per_match_kills)
@@ -133,3 +133,86 @@ def get_summary_stats():
         "ast_delta": ast_delta,
         "compare_against_last": COMPARE_AGAINST_LAST
     }
+
+
+
+
+@app.get('/stats/matches')
+def get_match_stats():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Pull match data from database
+    cursor.execute("""
+        SELECT *
+        FROM matches
+        ORDER by demo_id
+        DESC LIMIT ?
+    """, (COMPARE_AGAINST_LAST,))
+
+    matches = cursor.fetchall()
+
+
+    # Pull player data from database
+    cursor.execute("""
+        SELECT *
+        FROM kill_events
+        WHERE attacker_name = ? OR attacked_name = ? OR assister_name = ?
+    """, (PLAYER_NAME, PLAYER_NAME, PLAYER_NAME))
+
+    kill_events = cursor.fetchall()
+
+
+    # Close db connection
+    cursor.close()
+
+
+    # Isolate kill events where event["demo_id"] matches match["demo_id"]
+    per_match_kill_events = []
+    per_match_adr = []
+    
+    for index, match in enumerate(matches):
+        current_id = match["demo_id"]
+        current_events = []
+        for event in kill_events:
+            if event["demo_id"] == current_id:
+                current_events.append(event)
+
+        per_match_kill_events.append(current_events)
+
+    for index, match in enumerate(matches):
+        current_adr = 0;
+        current_dmg = 0;
+        rounds_played = match["total_rounds"]
+        print(f"Rounds Played This Match: {rounds_played}")
+        print(f"Map Name: {match["map_name"]}")
+        print(f"Demo ID: {match["demo_id"]}")
+
+        current_match_events = per_match_kill_events[index]
+        print(f"Match Event: {'current_match_events'}")
+        for event in current_match_events:
+            print(f'Event: {'event'}')
+            if event["attacker_name"] == PLAYER_NAME:
+                print(f'Attacker Name: {event['attacker_name']}')
+                current_dmg += event['dmg_dealt']
+
+        current_adr = round((current_dmg / rounds_played), 2)
+        current_match_stats = {
+            "map_name": match["map_name"],
+            "adr": current_adr,
+            "total_matches": COMPARE_AGAINST_LAST,
+        }
+
+        per_match_adr.append(current_match_stats)
+
+
+    return per_match_adr
+
+
+
+
+
+
+
+
+

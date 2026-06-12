@@ -124,37 +124,11 @@ def get_info_to_upload():
         for index, match in enumerate(per_match_player_death_events):
             if index < len(map_info):
                 map_info[index]["total_rounds_played"] = match[index]["total_rounds_played"]
+                map_info[index]["match_winner"] = match[index]["winnder"]
             else:
                 break
 
-    print("\n")
-        
-    #print(f'Map Names: {map_info}')
-    #print(f'Player Death Events: {player_death_events}')
-    #for index, match in enumerate(per_match_player_death_events):
-        #print(f'Demo ID: {map_info[index]["demo_id"]}')
-        #print(f'Map Name: {map_info[index]["map_name"]}')
-        #print(f'Round Num: {match[index]["total_rounds_played"]}\n')
-        #for event in match:
-            #print(f'Round Event Took Place: {event["round_num"]}')
-            #print(f'Attacker: {event["attacker_name"]}')
-            #print(f'Attacker Pos: {event["attacker_pos"]}')
-            #print(f'Attacker Team: {event["attacker_team_name"]}')
-            #print(f'Attacked: {event["attacked_name"]}')
-            #print(f'Attacked Pos: {event["attacked_pos"]}')
-            #print(f'Attacked Team: {event["attacked_team_name"]}')
-            #print(f'Assister: {event["assister_name"]}')
-            #print(f'Assister Pos: {event["assister_pos"]}')
-            #print(f'Assister Team: {event["assister_team_name"]}')
-            #print(f'Body Part Hit: {event["hit_group"]}')
-            #print(f'Headshot: {event["headshot"]}')
-            #print(f'Weapon Used: {event["weapon_used"]}')
-            #print(f'Damage Dealt: {event["dmg_dealt"]}')
-            #print(f'Kill Distance: {event["kill_distance"]}')
-            #print(f'Kill From: {event["attacker_last_place_name"]}')
-            #print(f'Killed At: {event["attacked_last_place_name"]}')
-            #print(f'Tick: {event["tick"]}')
-            #print(f'Demo ID: {event["demo_id"]}\n')
+    print("\n") 
 
     return map_info, per_match_player_death_events
 

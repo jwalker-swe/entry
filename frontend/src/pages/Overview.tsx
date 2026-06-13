@@ -1,5 +1,6 @@
 import StatCard from "../components/stats/StatCard";
 import AdrTrendChart from "../components/charts/AdrTrendChart";
+import WinRateChart from "../components/charts/WinRateChart";
 import { useState, useEffect } from 'react';
 
 export default function Overview() {
@@ -63,6 +64,8 @@ export default function Overview() {
 			>
 				<div className="w-full h-full">
 					<AdrTrendChart matches={matches} compare={stats?.compare_against_last}/>	
+				</div>
+				<div className="w-full h-full">
 				</div>
 			</section>
 		</div>

@@ -55,7 +55,7 @@ def get_death_events(parser):
     # Create data frame based on player_death events and filter based on if a specific user was involved in the event
     df = parser.parse_event("player_death", player=["X", "Y", "Z", "last_place_name", "team_name", "total_rounds_played", "round_freeze_end", "hitgroup"])
     round_wins = parser.parse_event("round_end", other=["round", "winner"])
-    #print(round_wins)
+    print(round_wins)
     #filtered_df = df.loc[(df["attacker_name"] == "Cereal") | (df["user_name"] == "Cereal") | (df["assister_name"] == "Cereal")]
 
     # Iterate over each row in the filtered data frame and create a list of dictionaries with the key value pairs listed below
@@ -124,7 +124,7 @@ def get_info_to_upload():
         for index, match in enumerate(per_match_player_death_events):
             if index < len(map_info):
                 map_info[index]["total_rounds_played"] = match[index]["total_rounds_played"]
-                map_info[index]["match_winner"] = match[index]["winnder"]
+                map_info[index]["match_winner"] = match[index]["round_winner"]
             else:
                 break
 

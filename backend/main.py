@@ -109,9 +109,7 @@ def get_summary_stats():
     recent_adr = calculate_adr(recent_dmg_dealt, recent_total_rounds)
     recent_per_match_kills = get_per_match_kills(recent_matches, recent_kill_event_rows)
     recent_ast = calculate_ast(recent_matches, recent_per_match_kills)
-
-    print(f"Recent kd: {recent_kd}")
-    
+ 
     kd_delta = compare_stat(kd, recent_kd)
     hsPercentage_delta = compare_stat(hsPercentage, recent_hsPercentage)
     adr_delta = compare_stat(adr, recent_adr)
@@ -184,16 +182,10 @@ def get_match_stats():
         current_adr = 0;
         current_dmg = 0;
         rounds_played = match["total_rounds"]
-        print(f"Rounds Played This Match: {rounds_played}")
-        print(f"Map Name: {match["map_name"]}")
-        print(f"Demo ID: {match["demo_id"]}")
 
         current_match_events = per_match_kill_events[index]
-        print(f"Match Event: {'current_match_events'}")
         for event in current_match_events:
-            print(f'Event: {'event'}')
             if event["attacker_name"] == PLAYER_NAME:
-                print(f'Attacker Name: {event['attacker_name']}')
                 current_dmg += event['dmg_dealt']
 
         current_adr = round((current_dmg / rounds_played), 2)
@@ -212,8 +204,34 @@ def get_match_stats():
 
 
 
+@app.get('/stats/map-win-rate')
+def get_winRate_per_map():
+    conn = get_connection
+    cursor = conn.cursor
+
+    cursor.execute("""
+        SELECT *
+        FROM matches
+    """)
+
+    matches = cursor.fetchall()
+
+    cursor.close()
+
+    per_map_winRate = []
+    map_names_list = []
+    for match in matches:
+        map_names_list.append(match["map_name"])
+
+    map_name_set = set(list_map_names)
+
+    for map_name in map_name_set:
+        current_map_name = map_name;
+        w = 0;
+        l = 0;
+        for match in matches:
+            if match["map_name"] == current_map_name:
+                return
 
 
-
-
-
+        

@@ -75,15 +75,13 @@ def insert_match(conn, demo_id: str, map_name: str, total_rounds: int) -> int | 
             INSERT INTO matches (
                 demo_id,
                 map_name,
-                total_rounds,
-                match_winner,
+                total_rounds
             ) VALUES (
                 ?,
                 ?,
-                ?,
-                ?,
+                ?
             )
-        ''', (demo_id, map_name, total_rounds, match_winner))
+        ''', (demo_id, map_name, total_rounds))
 
         conn.commit()
         return cursor.lastrowid

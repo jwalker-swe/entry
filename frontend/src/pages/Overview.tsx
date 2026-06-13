@@ -7,6 +7,7 @@ export default function Overview() {
 
 	const [stats, setStats] = useState(null)
 	const [matches, setMatches] = useState(null)
+	const [winRates, setWinRates] = useState(null)
 	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
@@ -14,16 +15,19 @@ export default function Overview() {
 		async function fetchData() {
 			try {
 				
-				const [summaryRes, matchesRes] = await Promise.all([
+				const [summaryRes, matchesRes, winRateRes] = await Promise.all([
 					fetch('http://localhost:8000/stats/summary'),
 					fetch('http://localhost:8000/stats/matches'),
+					fetch('http://localhost:8000/stats/map-win-rate')
 				])
 
 				const summaryData = await summaryRes.json()
 				const matchesData = await matchesRes.json()
+				const winRateData = await winRateRes.json()
 
 				setStats(summaryData)
 				setMatches(matchesData)
+				setWinRates(winRateData)
 				setIsLoading(false)
 
 			} catch {
@@ -48,6 +52,7 @@ export default function Overview() {
 
 	console.log('Stats: ', stats)
 	console.log('Matches: ', matches)
+	console.log('WinRates: ', winRates)
 
 	return (
 		<div className="w-full h-full p-4">
@@ -66,6 +71,7 @@ export default function Overview() {
 					<AdrTrendChart matches={matches} compare={stats?.compare_against_last}/>	
 				</div>
 				<div className="w-full h-full">
+					<WinRateChart data={winRates} />
 				</div>
 			</section>
 		</div>

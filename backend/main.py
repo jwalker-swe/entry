@@ -162,7 +162,7 @@ def get_match_stats():
 
 
     # Close db connection
-    cursor.close()
+    conn.close()
 
 
     # Isolate kill events where event["demo_id"] matches match["demo_id"]
@@ -206,8 +206,8 @@ def get_match_stats():
 
 @app.get('/stats/map-win-rate')
 def get_winRate_per_map():
-    conn = get_connection
-    cursor = conn.cursor
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         SELECT *
@@ -216,7 +216,51 @@ def get_winRate_per_map():
 
     matches = cursor.fetchall()
 
-    cursor.close()
+    conn.close()
 
-    print(f"Match Info: {matches}")
+#    matches = {
+#        "map_name": map_name,
+#        "match_status": match_status,
+#        "total_rounds_played": total_rounds_played,
+#        "ct_round_wins": player_ct_round_wins,
+#        "ct_round_losses": player_ct_round_losses,
+#        "t_round_wins": player_t_round_wins,
+#        "t_round_losses": player_t_round_losses
+#    }
+
+    # Create set of map names from matches to prevent duplicates
+    set_of_maps = {match["map_name"] for match in matches}
+
+    # Initialize empty list which will be populated with map_winrate dicts 
+    per_map_winrate = []
+
+    # Iterate of set_of_maps and calculate win_rate per map in set_of_maps 
+    # based on map appearance in matches
+    for index, m in enumerate(set_of_maps):
+
+        total_appearances = 0;
+        total_wins = 0
+
+        for index, match in enumerate(matches):
+
+            if match["map_name"] == m:
+                total_appearances += 1
+
+                if match["match_status"] == 'Won':
+                    total_wins += 1
+
+        win_rate = (round((total_wins / total_appearances), 2) * 100) if total_appearances > 0 else 0
+
+        map_winrate = {
+            "map_name": m,
+            "win_rate": win_rate
+        }
+
+        per_map_winrate.append(map_winrate)
+        sorted_per_map_winrate = sorted(per_map_winrate, key=lambda x: x["win_rate"], reverse=True)
+
+    return sorted_per_map_winrate
         
+        
+    # Need to return a list of dictionaries{ map_name: "...", win_rate: 00 } 
+    

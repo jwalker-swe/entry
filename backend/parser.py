@@ -43,11 +43,75 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.max_colwidth', None)
 
 
-def get_map_name(parser) -> str:
+def get_map_info(parser) -> str:
+    # Get df of map headers
     df = parser.parse_header()
     map_name: str = df["map_name"]
+    
+    # Get df of round events and df of player info
+    df = parser.parse_event("round_end", other=["winner", "total_rounds_played"])
+    round_end_ticks = df['tick'].tolist()
+    player_ticks = parser.parse_ticks(["team_num", "name"], ticks=round_end_ticks)
+    player_data = player_ticks[player_ticks["name"] == PLAYER_NAME]
 
-    return map_name
+    player_team_round_wins = 0
+    player_team_round_losses = 0
+    player_ct_round_wins = 0
+    player_ct_round_losses = 0
+    player_t_round_wins = 0
+    player_t_round_losses = 0
+
+    for index, r in enumerate(player_data.itertuples()):
+        current_side = ''
+        if r.team_num == 2:
+            current_side = 'T'
+        elif r.team_num == 3:
+            current_side = 'CT'
+
+        print(f"Current Side: {current_side}")
+
+        winning_side = df["winner"]
+        print(f"Winning Side: {winning_side[index]}")
+
+        if current_side == winning_side[index]:
+            player_team_round_wins += 1
+            if current_side == 'T':
+                player_t_round_wins += 1
+            else:
+                player_ct_round_wins += 1
+        else:
+            player_team_round_losses += 1
+            if current_side == 'T':
+                player_t_round_losses += 1
+            else:
+                player_ct_round_losses += 1
+
+
+    # Match won 0 == win, 1 == loss, 2 == draw
+    match_won = -1
+
+    if player_team_round_wins > player_team_round_losses:
+        match_won = 0
+    elif player_team_round_wins < player_team_round_losses:
+        match_won = 1
+    elif player_team_round_wins == player_team_round_losses:
+        match_won = 2
+
+    print(f"Match Won Status: {match_won}")
+    print(f"Rounds Won: {player_team_round_wins}")
+    print(f"Rounds Loss: {player_team_round_losses}")
+
+    total_rounds_played = max(df["total_rounds_played"])
+
+    map_info = {
+        "map_name": map_name,
+        "match_won": match_won,
+        "total_rounds_played": total_rounds_played
+    }
+    
+
+
+    return map_info
 
 
 
@@ -55,7 +119,6 @@ def get_death_events(parser):
     # Create data frame based on player_death events and filter based on if a specific user was involved in the event
     df = parser.parse_event("player_death", player=["X", "Y", "Z", "last_place_name", "team_name", "total_rounds_played", "round_freeze_end", "hitgroup"])
     round_wins = parser.parse_event("round_end", other=["round", "winner"])
-    print(round_wins)
     #filtered_df = df.loc[(df["attacker_name"] == "Cereal") | (df["user_name"] == "Cereal") | (df["assister_name"] == "Cereal")]
 
     # Iterate over each row in the filtered data frame and create a list of dictionaries with the key value pairs listed below
@@ -111,27 +174,30 @@ def get_info_to_upload():
     for index, path in enumerate(paths_to_demos):
         print(f"Parsing: {path}")
         parser = DemoParser(path)
-
-        map_info.append({"map_name": get_map_name(parser), "demo_id": path.split("/")[-1].split(".")[0]})
-        #demo_id = map_info[index]["demo_path"].split("/")[-1].split(".")[0]
-        death_events = get_death_events(parser)
-        for event in death_events:
-            event["map_name"] = map_info[index]["map_name"]
-            event["demo_id"] = map_info[index]["demo_id"]
-
-        per_match_player_death_events.append(death_events)
-
-        for index, match in enumerate(per_match_player_death_events):
-            if index < len(map_info):
-                map_info[index]["total_rounds_played"] = match[index]["total_rounds_played"]
-                map_info[index]["match_winner"] = match[index]["round_winner"]
-            else:
-                break
+#
+        print(f"Map Info: {get_map_info(parser)}")
+#        map_info.append({"map_name": get_map_info(parser), "demo_id": path.split("/")[-1].split(".")[0]})
+#        #demo_id = map_info[index]["demo_path"].split("/")[-1].split(".")[0]
+#        death_events = get_death_events(parser)
+#        for event in death_events:
+#            event["map_name"] = map_info[index]["map_name"]
+#            event["demo_id"] = map_info[index]["demo_id"]
+#
+#        per_match_player_death_events.append(death_events)
+#
+#        for index, match in enumerate(per_match_player_death_events):
+#            if index < len(map_info):
+#                map_info[index]["total_rounds_played"] = match[index]["total_rounds_played"]
+#                map_info[index]["match_winner"] = match[index]["round_winner"]
+#            else:
+#                break
 
     print("\n") 
 
-    return map_info, per_match_player_death_events
+#    return map_info, per_match_player_death_events
 
 
-#get_info_to_upload()
+get_info_to_upload()
 
+
+    

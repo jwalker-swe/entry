@@ -222,6 +222,7 @@ def get_winRate_per_map():
     map_names_list = []
     for match in matches:
         map_names_list.append(match["map_name"])
+        match["match_winner"]
 
     map_name_set = set(list_map_names)
 

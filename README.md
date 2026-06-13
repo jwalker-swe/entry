@@ -1,134 +1,107 @@
 # CS2 Demo Stat Tracker
 
-> ⚠️ **Work in progress** — this project is in early development. Core stat computation is being implemented and the dashboard does not exist yet.
+> ⚠️ **Work in progress** — this project is in active development. Backend ingestion and core stat API are functional, and the React dashboard is currently being built.
 
-A personal CS2 statistics tracker that parses match demo files to extract and visualise performance data. The goal is to track kills, deaths, damage, and positional data across matches and display them in a local Plotly Dash dashboard.
+A personal CS2 statistics tracker that parses match demo files to extract and visualise performance data. The goal is to track kills, deaths, damage, and positional data across matches and display them in a modern web dashboard.
 
 ---
 
-## Planned Features
+## Features
 
-- Parse CS2 `.dem` files using `demoparser2`
-- Compute K/D, ADR, headshot %, KAST, and side splits per match
-- Store match history and per-kill events in a local SQLite database
-- Auto-import new demos via a folder watcher
-- Interactive Dash dashboard with:
-  - Performance trends over time (K/D, ADR, KAST)
-  - Per-map win rate and stat breakdowns
-  - Death density heatmap overlaid on CS2 radar images
-  - Kill-line map showing attacker and victim positions
-  - Weapon breakdown and area death analysis
+- **Demo Parsing:** Uses `demoparser2` to extract raw event data from CS2 `.dem` files.
+- **Stat Computation:** Calculates K/D, ADR, Headshot %, and KAST with side-split support.
+- **Trend Analysis:** Compare current performance against recent matches (moving averages).
+- **Match History:** Persistent storage using SQLite.
+- **Automated Pipeline:** Automatic ingestion and cleanup of demo files.
+- **Modern Dashboard:** React-based frontend with interactive charts (WIP).
 
 ---
 
 ## Current Status
 
-| Module | Status |
-|---|---|
-| `parser.py` | In progress |
-| `stats.py` | In progress |
-| `db.py` | Not started |
-| `watcher.py` | Not started |
-| `app.py` | Not started |
-
----
-
-## Requirements
-
-- Python 3.10+
-- CS2 installed via Steam (for demo files)
-
----
-
-## Installation
-
-**1. Clone the repository**
-
-```bash
-git clone https://github.com/yourusername/cs2-tracker.git
-cd cs2-tracker
-```
-
-**2. Create and activate a virtual environment**
-
-```bash
-python -m venv .venv
-
-# macOS/Linux
-source .venv/bin/activate
-
-# Windows
-.venv\Scripts\activate
-```
-
-**3. Install dependencies**
-
-```bash
-pip install -r requirements.txt
-```
-
-**4. Configure your player name**
-
-Open `config.py` and update the following:
-
-```python
-PLAYER_NAME  = "YourSteamUsername"
-REPLAYS_DIR  = r"C:\path\to\your\csgo\replays"
-DB_PATH      = "cs2_stats.db"
-```
-
-Your Steam display name must match exactly — this is how the tracker identifies your events in the demo data.
+| Module | Status | Technology |
+|---|---|---|
+| **Backend API** | ✅ Functional | FastAPI, Python |
+| **Demo Parser** | ✅ Functional | demoparser2, Pandas |
+| **Database** | ✅ Functional | SQLite |
+| **Ingestion Pipeline** | ✅ Functional | Watcher/Script |
+| **Frontend Dashboard**| 🏗️ In Progress | React, TypeScript, Tailwind CSS |
 
 ---
 
 ## Project Structure
 
 ```
-cs2-tracker/
-├── src/
-│   ├── parser.py       # Demo parsing — raw events → DataFrames
-│   ├── stats.py        # Stat computation — DataFrames → metrics
-│   ├── db.py           # SQLite read/write
-│   ├── watcher.py      # Folder watcher and pipeline orchestration
-│   └── app.py          # Plotly Dash dashboard
-├── assets/
-│   └── maps/           # CS2 radar PNG images (see below)
-├── config.py           # Player name, paths, and map configs
-├── requirements.txt
-├── .gitignore
+entry/
+├── backend/            # FastAPI Server & Ingestion
+│   ├── main.py         # API Endpoints
+│   ├── app.py          # Ingestion logic
+│   ├── parser.py       # Demo parsing
+│   ├── stats.py        # Stat computation
+│   ├── db.py           # Database management
+│   └── watcher.py      # File cleanup & automation
+├── frontend/           # React Dashboard
+│   ├── src/
+│   │   ├── components/ # Reusable UI & Charts
+│   │   ├── pages/      # Dashboard views (Overview, Heatmaps, etc.)
+│   │   └── api/        # Backend communication
+├── demos/              # Drop .dem files here for ingestion
 └── README.md
 ```
 
 ---
 
-## Getting Demo Files
+## Getting Started
 
-1. Open CS2 and go to **Watch → Your Matches**
-2. Click the download icon next to any match
-3. Demos save to your CS2 replays folder:
+### Backend Setup
 
-```
-Windows: C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\replays\
-```
+1. **Navigate to backend directory**
+   ```bash
+   cd backend
+   ```
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Configure `config.py`**
+   ```python
+   PLAYER_NAME = "YourName"
+   DEMO_DIRECTORY = "/path/to/your/demos"
+   ```
+4. **Run the API server**
+   ```bash
+   fastapi dev main.py
+   ```
+
+### Frontend Setup
+
+1. **Navigate to frontend directory**
+   ```bash
+   cd frontend
+   ```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
 ---
 
 ## Stat Definitions
 
-**K/D** — kills divided by deaths. Above 1.0 means more kills than deaths per match.
-
-**ADR** — average damage per round. Measures round impact independent of kills. Benchmarks: below 60 weak, 60–75 average, 75–90 above average, 90+ strong.
-
-**Headshot %** — percentage of your kills that were headshots.
-
-**KAST** — percentage of rounds where you got a Kill, Assist, Survived, or were Traded within 5 seconds of dying. The best single measure of overall round contribution.
-
-**Side split** — K/D computed separately for T-side and CT-side rounds.
+- **K/D** — Kills divided by deaths.
+- **ADR** — Average Damage per Round.
+- **HS %** — Percentage of kills that were headshots.
+- **KAST** — Percentage of rounds with a Kill, Assist, Survival, or Traded death.
 
 ---
 
 ## Acknowledgements
 
 - [demoparser2](https://github.com/LaihoE/demoparser) — CS2 demo parsing
-- [Plotly Dash](https://dash.plotly.com/) — dashboard framework
-- [ghostcap-gaming/cs2-map-images](https://github.com/ghostcap-gaming/cs2-map-images) — CS2 radar images (required for heatmap visualisations, not yet implemented)
+- [FastAPI](https://fastapi.tiangolo.com/) — Backend framework
+- [Vite](https://vitejs.dev/) & [React](https://reactjs.org/) — Frontend stack
+- [Tailwind CSS](https://tailwindcss.com/) — Styling

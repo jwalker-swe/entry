@@ -14,8 +14,19 @@ def ingest_demos():
 
     info_to_upload = get_info_to_upload()
 
-    for i, map in enumerate(info_to_upload[0]):
-        match_id = insert_match(conn, map["demo_id"], map["map_name"], map["total_rounds_played"])
+    for i, m in enumerate(info_to_upload[0]):
+        match_id = insert_match(
+            conn, 
+            m["demo_id"], 
+            m["map_name"], 
+            m["total_rounds_played"],
+            m["match_status"],
+            m["ct_round_wins"],
+            m["ct_round_losses"],
+            m["t_round_wins"],
+            m["t_round_losses"]
+            )
+
         if match_id is not None:
             print(f"Adding kda stats for {match_id}...")
             insert_kill_events(conn, match_id, info_to_upload[1][i])

@@ -24,7 +24,11 @@ def create_tables(conn):
             demo_id TEXT UNIQUE NOT NULL,
             map_name TEXT,
             total_rounds INTEGER,
-            match_winner TEXT
+            match_status TEXT,
+            ct_round_wins INTEGER,
+            ct_round_losses INTEGER,
+            t_round_wins INTEGER,
+            t_round_losses INTEGER
         )
     """)
 
@@ -66,7 +70,11 @@ def create_tables(conn):
 
     conn.commit()
 
-def insert_match(conn, demo_id: str, map_name: str, total_rounds: int) -> int | None:
+def insert_match(
+conn, demo_id: str, map_name: str, total_rounds: int, 
+match_status: str, ct_round_wins: int, ct_round_losses: int, 
+t_round_wins: int, t_round_losses: int) -> int | None:
+
     cursor = conn.cursor()
 
     try:
@@ -75,13 +83,23 @@ def insert_match(conn, demo_id: str, map_name: str, total_rounds: int) -> int | 
             INSERT INTO matches (
                 demo_id,
                 map_name,
-                total_rounds
+                total_rounds,
+                match_status,
+                ct_round_wins,
+                ct_round_losses,
+                t_round_wins,
+                t_round_losses
             ) VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
                 ?,
                 ?,
                 ?
             )
-        ''', (demo_id, map_name, total_rounds))
+        ''', (demo_id, map_name, total_rounds, match_status, ct_round_wins, ct_round_losses, t_round_wins, t_round_losses))
 
         conn.commit()
         return cursor.lastrowid

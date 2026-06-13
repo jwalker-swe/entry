@@ -197,7 +197,7 @@ def get_info_to_upload():
     return map_info, per_match_player_death_events
 
 
-get_info_to_upload()
+#get_info_to_upload()
 
 
     

@@ -218,21 +218,5 @@ def get_winRate_per_map():
 
     cursor.close()
 
-    per_map_winRate = []
-    map_names_list = []
-    for match in matches:
-        map_names_list.append(match["map_name"])
-        match["match_winner"]
-
-    map_name_set = set(list_map_names)
-
-    for map_name in map_name_set:
-        current_map_name = map_name;
-        w = 0;
-        l = 0;
-        for match in matches:
-            if match["map_name"] == current_map_name:
-                return
-
-
+    print(f"Match Info: {matches}")
         

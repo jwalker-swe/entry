@@ -1,5 +1,5 @@
 from typing import TypedDict
-from parser import get_death_events, get_map_name
+from parser import get_death_events, get_map_info
 from demoparser2 import DemoParser
 from config import PLAYER_NAME
 import pandas as pd 

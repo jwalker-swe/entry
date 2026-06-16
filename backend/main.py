@@ -1,5 +1,6 @@
 from fastapi import FastAPI 
 from fastapi.middleware.cors import CORSMiddleware
+from collections import defaultdict
 from db import get_connection
 from app import ingest_demos
 from config import PLAYER_NAME, COMPARE_AGAINST_LAST
@@ -263,4 +264,55 @@ def get_winRate_per_map():
         
         
     # Need to return a list of dictionaries{ map_name: "...", win_rate: 00 } 
-    
+@app.get('/stats/kill-feed')   
+def get_recentKills():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM kill_events
+        WHERE attacker_name = ? OR attacked_name = ?
+        ORDER BY demo_id DESC, tick DESC
+        LIMIT 10
+    """, (PLAYER_NAME, PLAYER_NAME,))
+
+    kill_events = cursor.fetchall()
+
+#    events = {
+#        id INTEGER PRIMARY KEY AUTOINCREMENT,
+#        match_id INTEGER NOT NULL,
+#        demo_id TEXT NOT NULL,
+#        map_name TEXT,
+#        round_num INTEGER,
+#        attacker_name TEXT,
+#        attacked_name TEXT,
+#        assister_name TEXT,
+#        attacker_team_name TEXT,
+#        attacked_team_name TEXT,
+#        assister_team_name TEXT,
+#        attacker_x REAL,
+#        attacker_y REAL,
+#        attacker_z REAL,
+#        attacked_x REAL,
+#        attacked_y REAL,
+#        attacked_z REAL,
+#        assister_x REAL,
+#        assister_y REAL,
+#        assister_z REAL,
+#        attacker_last_place_name TEXT,
+#        attacked_last_place_name TEXT,
+#        assister_last_place_name TEXT,
+#        weapon_used TEXT,
+#        kill_distance REAL,
+#        headshot INTEGER,
+#        hit_group TEXT,
+#        dmg_dealt REAL,
+#        dmg_received REAL,
+#        tick INTEGER,
+#        FOREIGN KEY (match_id) REFERENCES matches(id)
+#    }
+
+    conn.close()
+
+    return kill_events, PLAYER_NAME

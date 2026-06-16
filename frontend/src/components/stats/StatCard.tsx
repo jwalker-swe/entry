@@ -16,9 +16,19 @@ export default function StatCard({ label, value, delta, compare_against, unit, i
 	return (
 		<>
 			<div className="w-full h-fit bg-cards border-1 border-border rounded-md p-4 tabular-nums">
-				<p className="text-text1 text-4xl font-bold tabular-nums">
-					{value}{unit && <span className="ml-1 tabular-nums">{unit}</span>}
-				</p>
+				{ delta > 0 ? (
+					<p className="text-green-500 text-4xl font-bold tabular-nums">
+						{value}{unit && <span className="ml-1 tabular-nums">{unit}</span>}
+					</p>
+				) : delta < 0 ? (
+					<p className="text-red-500 text-4xl font-bold tabular-nums">
+						{value}{unit && <span className="ml-1 tabular-nums">{unit}</span>}
+					</p>
+				) : (
+					<p className="text-gray-500 text-4xl font-bold tabular-nums">
+						{value}{unit && <span className="ml-1 tabular-nums">{unit}</span>}
+					</p>
+				)}
 				<p className="text-text2 text-md">
 					{label}
 				</p>

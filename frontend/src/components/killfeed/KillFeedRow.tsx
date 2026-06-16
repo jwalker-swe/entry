@@ -51,8 +51,10 @@ interface KillFeedRowProps {
 export default function KillFeedRow({ attacker, attacked, statusColor, headshot, hitGroup, weapon }: KillFeedRowProps) {
 
 	const attacker_color = attacker == 'You' ? 'text-text2' : 'text-text3';
+	const attacker_bg_color = attacker == 'You' ? 'bg-text2' : 'bg-text3';
 	const basePath = '/weapon_icons/svg_normal/';		
 	const imgPath = basePath + weapon + '.svg';
+	const hit = headshot ? 'headshot' : hitGroup;
 
 	return (
 		<div
@@ -69,7 +71,20 @@ export default function KillFeedRow({ attacker, attacked, statusColor, headshot,
 				<span className={`${attacker_color} font-semibold`}>
 					{attacker}
 				</span>
-				<img src={imgPath} alt={`${weapon} icon`} className={`px-2 text-text3 fill-text3 w-26 h-7.75`} /> 
+				<div
+					className={`mx-2 ${attacker_bg_color} w-26 h-7.75`}
+					style={{
+						maskImage: `url(${imgPath})`,
+						maskRepeat: 'no-repeat',
+						maskPosition: 'center',
+						maskSize: 'contain',
+						WebkitMaskImage: `url(${imgPath})`,
+						WebkitMaskRepeat: `no-repeat`,
+						WebkitmaskPosition: 'center',
+						WebkitMaskSize: 'contain'
+					}}
+				>
+				</div>
 				<span className={`${attacker_color}`}>
 					{attacked}
 				</span>
@@ -77,7 +92,7 @@ export default function KillFeedRow({ attacker, attacked, statusColor, headshot,
 			<div
 				className={`w-fit h-full`}
 			>
-				<OutcomePill statusColor={statusColor} hitGroup={hitGroup} />	
+				<OutcomePill statusColor={statusColor} hitGroup={hit} />	
 			</div>
 		</div>
 	)

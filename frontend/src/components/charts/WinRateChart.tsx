@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 interface WinRate {
 	map_name: string;
 	win_rate: number;
@@ -11,9 +13,20 @@ interface WinRateByMapProps {
 
 export default function WinRateByMap({ data }: WinRateByMapProps) {
 
+	const [isExpanded, setIsExpanded] = useState(false);
 	const sorted_maps = [...data].sort((a, b) => b.win_rate - a.win_rate);
 
-	console.log("Win Rate Data: ", data)
+	// Create animation for progress bar by setting timer to isExpanded becoming true
+	useEffect(() => {
+
+		const timer = setTimeout(() => {
+			setIsExpanded(true);
+		}, 200);
+
+		return () => clearTimeout(timer);
+
+	}, []);
+
 
 	return (
 		<div className={`w-full h-full bg-cards border-1 border-border rounded-lg p-4`}>
@@ -44,11 +57,12 @@ export default function WinRateByMap({ data }: WinRateByMapProps) {
 									bg-border
 									rounded-full overflow-hidden`
 								}>
-									<div 
+									<div
+										style={{ width: isExpanded ? `${map.win_rate}%` : 0}}
 										className={`
 											percentage-bar h-full ${barColor} 
-											transition-all duration-500 rounded-full`} 
-										style={{ width: `${map.win_rate}%`}}
+											transition-all duration-500 ease-in-out
+											rounded-full`} 
 									>
 									</div>
 								</div>

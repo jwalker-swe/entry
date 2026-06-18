@@ -2,6 +2,7 @@ import StatCard from "../components/stats/StatCard";
 import AdrTrendChart from "../components/charts/AdrTrendChart";
 import WinRateChart from "../components/charts/WinRateChart";
 import KillFeedList from "../components/killfeed/KillFeedList";
+import SideSplit from "../components/charts/SideSplitChart";
 
 import { useState, useEffect } from 'react';
 
@@ -10,30 +11,34 @@ export default function Overview() {
 	const [stats, setStats] = useState(null)
 	const [matches, setMatches] = useState(null)
 	const [winRates, setWinRates] = useState(null)
-	const [isLoading, setIsLoading] = useState(true)
 	const [killFeed, setKillFeed] = useState(null)
+	const [sideSplit, setSideSplit] = useState(null)
+	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
 
 		async function fetchData() {
 			try {
 				
-				const [summaryRes, matchesRes, winRateRes, killFeedRes] = await Promise.all([
+				const [summaryRes, matchesRes, winRateRes, killFeedRes, sideSplitRes] = await Promise.all([
 					fetch('http://localhost:8000/stats/summary'),
 					fetch('http://localhost:8000/stats/matches'),
 					fetch('http://localhost:8000/stats/map-win-rate'),
-					fetch('http://localhost:8000/stats/kill-feed')
+					fetch('http://localhost:8000/stats/kill-feed'),
+					fetch('http://localhost:8000/stats/side-split')
 				])
 
 				const summaryData = await summaryRes.json()
 				const matchesData = await matchesRes.json()
 				const winRateData = await winRateRes.json()
 				const killFeedData = await killFeedRes.json()
+				const sideSplitData = await sideSplitRes.json()
 
 				setStats(summaryData)
 				setMatches(matchesData)
 				setWinRates(winRateData)
 				setKillFeed(killFeedData)
+				setSideSplit(sideSplitData)
 				setIsLoading(false)
 
 			} catch {
@@ -60,6 +65,7 @@ export default function Overview() {
 	console.log('Matches: ', matches)
 	console.log('WinRates: ', winRates)
 	console.log('K Feed: ', killFeed)
+	console.log('Side Split Stats: ', sideSplit)
 
 	return (
 		<div className="w-full h-full p-4">
@@ -88,7 +94,7 @@ export default function Overview() {
 					<KillFeedList data={killFeed} />
 				</div>
 				<div className="w-full h-full">
-					
+					<SideSplit data={sideSplit} />
 				</div>
 			</section>
 

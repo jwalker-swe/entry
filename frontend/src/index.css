@@ -18,3 +18,9 @@
 	--color-text3:    #475569;
 	--color-active:   #061625;
 }
+
+
+
+.kill-feed-row:not(:last-child) {
+	border-bottom: 1px solid #1a2535;
+}

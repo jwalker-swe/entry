@@ -274,7 +274,7 @@ def get_recentKills():
         FROM kill_events
         WHERE attacker_name = ? OR attacked_name = ?
         ORDER BY demo_id DESC, tick DESC
-        LIMIT 10
+        LIMIT 9
     """, (PLAYER_NAME, PLAYER_NAME,))
 
     kill_events = cursor.fetchall()
@@ -316,3 +316,28 @@ def get_recentKills():
     conn.close()
 
     return kill_events, PLAYER_NAME
+
+@app.get("/stats/side-split")
+def get_side_split():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM kill_events
+        WHERE attacker_name = ? OR attacked_name = ?
+    """, (PLAYER_NAME, PLAYER_NAME))
+
+    events = cursor.fetchall()
+
+    t_side_events = []
+    ct_side_events = []
+
+    for event in events:
+        if event["attacker_name"] == PLAYER_NAME and event["attacker_team_name"] == 'TERRORIST' or event["attacked_name"] == PLAYER_NAME and event["attacked_team_name"] == 'TERRORIST':
+            t_side_events.append(event)
+        elif event["attacker_name"] == PLAYER_NAME and event["attacker_team_name"] == 'CT' or event["attacked_name"] == PLAYER_NAME and event["attacked_team_name"] == 'CT':
+            ct_side_events.append(event)            
+
+    return t_side_events, ct_side_events, PLAYER_NAME

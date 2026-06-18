@@ -66,7 +66,7 @@ export default function KillFeedList({ data }: KillFeedListProps) {
 						const attacked = got_kill ? event.attacked_name : 'You';
 
 						return (
-							<div key={index} className={`w-full h-fit`}>
+							<div key={index} className={`w-full h-fit kill-feed-row pt-1.5`}>
 								<KillFeedRow  attacker={attacker} attacked={attacked} statusColor={status_color} headshot={event.headshot} hitGroup={event.hit_group} weapon={event.weapon_used} />
 							</div>
 						)

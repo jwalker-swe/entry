@@ -59,7 +59,7 @@ export default function KillFeedRow({ attacker, attacked, statusColor, headshot,
 	return (
 		<div
 			className={`
-				w-full h-full flex justify-between items-center border-b-1 border-border py-2
+				w-full h-full flex justify-between items-center py-2
 			`}	
 		>
 			<div

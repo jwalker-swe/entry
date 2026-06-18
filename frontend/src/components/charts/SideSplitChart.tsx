@@ -93,7 +93,7 @@ export default function SideSplit({ data }: SideSplitProps) {
 				<div className={`
 					bg-void w-full h-full flex flex-col justify-center items-center p-2 rounded-md
 				`}>
-					<span className={`text-amber text-xl mt-2 mb-2`}>
+					<span className={`text-cobalt text-xl mt-2 mb-2`}>
 						CT SIDE
 					</span>
 					<span className={`text-text1 text-5xl font-semibold mb-2`}>

@@ -274,7 +274,7 @@ def get_recentKills():
         FROM kill_events
         WHERE attacker_name = ? OR attacked_name = ?
         ORDER BY demo_id DESC, tick DESC
-        LIMIT 9
+        LIMIT 6
     """, (PLAYER_NAME, PLAYER_NAME,))
 
     kill_events = cursor.fetchall()
@@ -340,4 +340,68 @@ def get_side_split():
         elif event["attacker_name"] == PLAYER_NAME and event["attacker_team_name"] == 'CT' or event["attacked_name"] == PLAYER_NAME and event["attacked_team_name"] == 'CT':
             ct_side_events.append(event)            
 
-    return t_side_events, ct_side_events, PLAYER_NAME
+    t_side_demo_ids = []
+    for event in t_side_events:
+        t_side_demo_ids.append(event["demo_id"])
+
+    ct_side_demo_ids = []
+    for event in ct_side_events:
+        ct_side_demo_ids.append(event["demo_id"])
+
+    t_demo_ids = list(set(t_side_demo_ids))
+    ct_demo_ids = list(set(ct_side_demo_ids))
+
+    t_placeholders = ", ".join("?" for _ in t_demo_ids)
+    ct_placeholders = ", ".join("?" for _ in ct_demo_ids)
+
+    cursor.execute(f"""
+        SELECT *
+        FROM matches
+        WHERE demo_id IN ({t_placeholders})
+    """, t_demo_ids)
+
+    t_side_matches = cursor.fetchall()
+
+    cursor.execute(f"""
+        SELECT *
+        FROM matches
+        WHERE demo_id IN ({ct_placeholders})
+    """, ct_demo_ids)
+
+    ct_side_matches = cursor.fetchall()
+
+
+    per_match_t_side_events = []
+    per_match_ct_side_events = []
+
+
+    for index, match in enumerate(t_side_matches):
+        current_demo_id = match["demo_id"]
+        current_events = []
+        for event in t_side_events:
+            if event["demo_id"] == current_demo_id:
+                current_events.append(event)
+
+        per_match_t_side_events.append(current_events)
+
+    for index, match in enumerate(ct_side_matches):
+        current_demo_id = match["demo_id"]
+        current_events = []
+        for event in ct_side_events:
+            if event["demo_id"] == current_demo_id:
+                current_events.append(event)
+
+        per_match_ct_side_events.append(current_events)
+
+    print(f"t_side_matches: {t_side_matches}")
+    print(f"ct_side_matches: {ct_side_matches}")
+
+
+    t_side_ast = calculate_ast(t_side_matches, per_match_t_side_events)
+    ct_side_ast = calculate_ast(ct_side_matches, per_match_ct_side_events)
+
+
+    print(f"t_side_ast: {t_side_ast}")   
+    print(f"ct_side_ast: {ct_side_ast}")
+
+    return t_side_events, t_side_ast, ct_side_events, ct_side_ast, PLAYER_NAME

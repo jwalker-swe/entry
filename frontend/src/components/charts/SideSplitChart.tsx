@@ -52,7 +52,7 @@ export default function SideSplit({ data }: SideSplitProps) {
 		)
 	}
 
-	const [tSideEvents, ctSideEvents, playerName] = data;
+	const [tSideEvents, tSideAST, ctSideEvents, ctSideAST, playerName] = data;
 
 	const tStats = calculateStats({ events: tSideEvents, player_name: playerName });
 	const ctStats = calculateStats({ events: ctSideEvents, player_name: playerName });
@@ -111,6 +111,30 @@ export default function SideSplit({ data }: SideSplitProps) {
 				</div>
 			</div>
 			<hr className={`text-text3 mt-4`}/>
+			<p className='text-text3 text-md font-semibold ml-4 mb-2 mt-4'>
+				KAST by side
+			</p>
+			<div
+				className={`
+					w-full h-fit grid grid-cols-2 grid-rows-1 gap-4 tabular-nums
+				`}	
+			>
+				<div className={`
+					bg-void w-full h-full flex justify-center items-center p-2 rounded-md
+				`}>
+					<span className={`text-amber text-xl mt-2 mb-2`}>
+						T SIDE <span className='text-text1'>{tSideAST}%</span>
+					</span>
+				</div>
+				<div className={`
+					bg-void w-full h-full flex justify-center items-center p-2 rounded-md
+				`}>
+					<span className={`text-cobalt text-xl mt-2 mb-2`}>
+						CT SIDE <span className='text-text1'>{ctSideAST}%</span>
+					</span>
+				</div>
+			</div>
+
 		</div>
 	)
 

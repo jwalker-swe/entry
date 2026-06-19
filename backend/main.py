@@ -393,15 +393,74 @@ def get_side_split():
 
         per_match_ct_side_events.append(current_events)
 
-    print(f"t_side_matches: {t_side_matches}")
-    print(f"ct_side_matches: {ct_side_matches}")
-
+    conn.close()
 
     t_side_ast = calculate_ast(t_side_matches, per_match_t_side_events)
     ct_side_ast = calculate_ast(ct_side_matches, per_match_ct_side_events)
 
-
-    print(f"t_side_ast: {t_side_ast}")   
-    print(f"ct_side_ast: {ct_side_ast}")
-
     return t_side_events, t_side_ast, ct_side_events, ct_side_ast, PLAYER_NAME
+
+@app.get("/stats/weapons")
+def get_weapon_data():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM kill_events
+        WHERE attacker_name = ?
+    """, (PLAYER_NAME,))
+
+    kill_events = cursor.fetchall()
+
+    possible_weapons = {event["weapon_used"] for event in kill_events}
+    per_weapon_stats = []
+    overall_hs = 0
+
+    hitbox_distribution = {
+            "head": 0,
+            "chest": 0,
+            "stomach": 0,
+            "limbs": 0
+            }
+
+    for weapon in possible_weapons:
+        current_weapon = weapon
+        current_kills = 0
+        total_headshots = 0 
+        dmg_list = []
+
+        for event in kill_events:
+            if event["weapon_used"] == current_weapon:
+                current_kills += 1 
+                dmg_list.append(event["dmg_dealt"])
+                if event["headshot"]:
+                    total_headshots += 1 
+                    hitbox_distribution["head"] += 1
+                    overall_hs += 1
+                else:
+                    if event["hit_group"] == "chest":
+                        hitbox_distribution["chest"] += 1 
+                    elif event["hit_group"] == "stomach":
+                        hitbox_distribution["stomach"] += 1
+                    elif "left" in event["hit_group"] or "right" in event["hit_group"]:
+                        hitbox_distribution["limbs"] += 1
+
+        hs_percentage = round((total_headshots / current_kills), 2) * 100
+        dmg_dealt = sum(dmg_list)
+        avg_dmg = round((sum(dmg_list) / len(dmg_list)), 1) 
+
+        weaponStats = {
+            "weapon_name": current_weapon,
+            "kills_with_weapon": current_kills,
+            "hs_percentage": hs_percentage,
+            "total_dmg": dmg_dealt,
+            "avg_dmg": avg_dmg,
+        }
+
+        per_weapon_stats.append(weaponStats)
+
+    overall_hs_percentage = round((overall_hs / len(kill_events)), 2) * 100 
+
+    return per_weapon_stats, overall_hs_percentage, hitbox_distribution

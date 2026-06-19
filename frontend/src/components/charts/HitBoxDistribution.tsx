@@ -18,7 +18,10 @@ interface WeaponDmgData {
 
 export default function HitBoxDistribution({ hitbox_data, weaponDmg_data }: {hitbox_data: DistributionData, weaponDmg_data: WeaponDmgData}) {
 
+	const [isExpanded, setIsExpanded] = useState(false);
+
 	const sorted_distribution = [];
+
 	for (const [key, value] of Object.entries(hitbox_data)) {
 
 		const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
@@ -64,6 +67,17 @@ export default function HitBoxDistribution({ hitbox_data, weaponDmg_data }: {hit
 
 					const barColor = index == 0 ? 'bg-cobalt' : index == 1 ? 'bg-teal' : index == 2 ? 'bg-amber' : index == 3 ? 'bg-lavender' : 'bg-text3';
 
+					useEffect(() => {
+
+						const timer = setTimeout(() => {
+
+							setIsExpanded(true);
+						}, 200);	
+
+						return () => clearTimeout(timer); 
+
+					}, []);
+
 					return (
 						<li key={index} className={`
 							w-full h-fit flex justify-between items-center
@@ -74,7 +88,8 @@ export default function HitBoxDistribution({ hitbox_data, weaponDmg_data }: {hit
 								{map.weapon_name.toUpperCase()}
 							</span>	
 							<div className='flex grow h-2 bg-void rounded-full'>
-								<div className={`${barColor} h-full rounded-full`} style={{ width: barWidthPercent }}>
+								<div className={`${barColor} h-full rounded-full transition-all duration-500 ease-in-out`} 
+									style={{ width: isExpanded ? barWidthPercent : 0 }}>
 								</div>
 							</div>
 							<span className={`text-text1 text-lg w-fit min-w-20 text-right tabular-nums`}>

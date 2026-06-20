@@ -51,16 +51,16 @@ export default function WeaponDonut({ data }: { data: WeaponKillData[] }) {
 			<p className="text-text3 text-lg font-semibold mb-4">
 				KILLS BY WEAPON
 			</p>
-			<div className="w-full h-fit flex justify-start items-center">
-				<PieChart width={200} height={160}>
+			<div className="w-full h-fit flex justify-start items-center py-8">
+				<PieChart width={300} height={240}>
 					<Pie
 						data={donutData}
 						dataKey="kills"
 						nameKey="weapon"
 						cx="50%"
 						cy="50%"
-						innerRadius={40}
-						outerRadius={70}
+						innerRadius={50}
+						outerRadius={120}
 					/>
 					<Tooltip contentStyle={{ background: "#111A22", border: "1px solid #1a2535"}} />
 				</PieChart>

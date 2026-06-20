@@ -15,7 +15,20 @@ const PALETTE_COLORS = [
 	"bg-text3",
 ]
 
+
 export default function WeaponsStatList({ data }: { data: WeaponData[] }) {
+
+const [isExpanded, setIsExpanded] = useState(false);
+
+	useEffect(() => {
+
+		const timer = setTimeout(() => {
+			setIsExpanded(true);
+		}, 200);
+
+	return () => clearTimeout(timer);
+
+	}, []);
 
 	const data_for_chart = data.filter((weapon) => weapon.weapon_name !== 'world' && weapon.weapon_name !== 'inferno');
 	
@@ -25,8 +38,7 @@ export default function WeaponsStatList({ data }: { data: WeaponData[] }) {
 		if (item.hs_percentage < lowest_hs_percentage) {
 			lowest_hs_percentage = item.hs_percentage;
 		};
-	});
-	
+	});	
 
 	return (
 		<div className={`
@@ -55,7 +67,7 @@ export default function WeaponsStatList({ data }: { data: WeaponData[] }) {
 								<span className='weapon-list-stat text-text1 w-10'>{item.kills_with_weapon}</span>
 								<span className='weapon-list-stat text-text1 w-20'>{item.avg_dmg}</span>
 								<div className='grow h-2 bg-void rounded-full mr-4'>
-									<div className={`${barColor} h-full rounded-full`} style={{width: barPercentage}}>
+									<div className={`${barColor} h-full rounded-full transition-all ease-in-out duration-500`} style={{width: isExpanded ? barPercentage : 0 }}>
 									</div>
 								</div>
 							</li>

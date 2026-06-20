@@ -37,6 +37,7 @@
 
 .weapon-list-item:not(:last-child) {
 	border-bottom: 1px solid;
+	border-color: #1a2535;
 }
 
 .weapon-list-item:last-child {

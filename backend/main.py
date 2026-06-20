@@ -464,3 +464,84 @@ def get_weapon_data():
     overall_hs_percentage = round((overall_hs / len(kill_events)), 2) * 100 
 
     return per_weapon_stats, overall_hs_percentage, hitbox_distribution
+
+
+@app.get('/stats/maps')
+def get_map_performance():
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Query matches to calculate win/loss stats
+    cursor.execute("""
+        SELECT *
+        FROM matches
+    """)
+    match_info = cursor.fetchall()
+
+    # Query kill events to calculate K/D, side-split K/D, and ADR
+    cursor.execute("""
+        SELECT *
+        FROM kill_events
+        WHERE attacker_name = ? OR attacked_name = ?
+    """, (PLAYER_NAME, PLAYER_NAME,))
+    kill_events = cursor.fetchall()
+
+    conn.close()
+
+    # Creat a set of maps played
+    map_pool = {match["map_name"] for match in match_info if match["map_name"]};
+    per_map_performance = []
+
+    for current_map in map_pool:
+        #Filter matches for the current map
+        map_matches = [m for m in match_info if m["map_name"] == current_map]
+        total_matches = len(map_matches)
+
+        total_wins = sum(1 for m in map_matches if m["match_status"] == 'Won')
+        total_losses = sum(1 for m in map_matches if m["match_status"] == 'Loss')
+        total_draws = sum(1 for m in map_matches if m["match_status"] == 'Draw')
+
+        total_rounds = sum(m["total_rounds"] for m in map_matches)
+
+        win_rate = round((total_wins / total_matches) * 100, 2) if total_matches > 0 else 0.0
+
+        #Filter kills/deaths for the current map
+        map_kills = [k for k in kill_events if k["map_name"] == current_map and k["attacker_name"] == PLAYER_NAME]
+        map_deaths = [k for k in kill_events if k["map_name"] == current_map and k["attacked_name"] == PLAYER_NAME]
+
+        kills = len(map_kills)
+        deaths = len(map_deaths)
+        kd = round(kills / deaths, 2) if deaths > 0 else float(kills)
+
+        #CT Side stats
+        ct_kills = sum(1 for k in map_kills if k["attacker_team_name"] == 'CT')
+        ct_deaths = sum(1 for k in map_deaths if k["attacked_team_name"] == 'CT')
+
+        ct_kd = round(ct_kills / ct_deaths, 2) if ct_deaths > 0 else float(ct_kills)
+
+        #T Side stats
+        t_kills = sum(1 for k in map_kills if k["attacker_team_name"] == 'TERRORIST')
+        t_deaths = sum(1 for k in map_deaths if k["attacked_team_name"] == 'TERRORIST')
+
+        t_kd = round(t_kills / t_deaths, 2) if t_deaths > 0 else float(t_kills)
+
+        #ADR calculation
+        total_dmg = sum(k["dmg_dealt"] for k in map_kills)
+        adr = round(total_dmg / total_rounds, 2) if total_rounds > 0 else 0.0
+
+        map_data = {
+            "map_name": current_map,
+            "kd": kd,
+            "adr": adr,
+            "win_rate": win_rate,
+            "total_wins": total_wins,
+            "total_losses": total_losses,
+            "ct_kd": ct_kd,
+            "t_kd": t_kd
+        }
+        per_map_performance.append(map_data)
+
+    return per_map_performance
+
+

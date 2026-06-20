@@ -1,6 +1,7 @@
 import StatCard from "../components/stats/StatCard";
 import HitBoxDistribution from "../components/charts/HitBoxDistribution";
 import WeaponDonut from "../components/charts/WeaponDonut";
+import WeaponsStatList from "../components/charts/WeaponsStatList";
 
 import { useState, useEffect } from 'react';
 
@@ -102,6 +103,7 @@ export default function Weapons() {
 					<HitBoxDistribution hitbox_data={sorted_hitbox_distribution} weaponDmg_data={weapons_by_total_dmg}/>
 				</div>
 			</section>
+			<WeaponsStatList data={weapons_by_total_kills} />
 		</div>
 	)
 }

@@ -1,3 +1,4 @@
+import {useState, useEffect} from 'react';
 import OutcomePill from "../killfeed/OutcomePill";
 
 type MapPerformanceProps = {
@@ -21,6 +22,18 @@ const PALETTE_COLORS = [
 
 
 export default function MapPerformance({ data }: { data: MapPerformanceProps[] }) {
+
+	const [isExpanded, setIsExpanded] = useState(false);
+
+	useEffect(() => {
+
+		const timer = setTimeout(() => {
+			setIsExpanded(true);
+		}, 200);
+
+		return () => clearTimeout(timer);
+
+	}, []);
 
 	const map_pool = ['de_ancient', 'de_anubis', 'de_dust2', 'de_inferno', 'de_mirage', 'de_nuke', 'de_overpass', 'de_train', 'de_vertigo'];
 	const sorted_map_data = [...data].sort((a, b) => b.win_rate - a.win_rate);
@@ -108,7 +121,7 @@ export default function MapPerformance({ data }: { data: MapPerformanceProps[] }
 							</div>
 						</div>
 						<div className="w-full h-2 bg-void rounded-full">
-							<div className={`h-2 ${barColor} rounded-full`} style={{width: barWidth}}>
+							<div className={`h-2 ${barColor} rounded-full transition-all duration-500 ease-in-out`} style={{width: isExpanded ? barWidth : '0%'}}>
 							</div>
 						</div>
 						<div className="grid grid-cols-2 grid-rows-1 gap-2 mt-4">

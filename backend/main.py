@@ -383,6 +383,7 @@ def get_recentKills():
 
     return kill_events, PLAYER_NAME
 
+
 @app.get("/stats/side-split")
 def get_side_split():
 
@@ -466,6 +467,7 @@ def get_side_split():
 
     return t_side_events, t_side_ast, ct_side_events, ct_side_ast, PLAYER_NAME
 
+
 @app.get("/stats/weapons")
 def get_weapon_data():
 
@@ -503,16 +505,8 @@ def get_weapon_data():
                 dmg_list.append(event["dmg_dealt"])
                 if event["headshot"]:
                     total_headshots += 1 
-                    hitbox_distribution["head"] += 1
                     overall_hs += 1
-                else:
-                    if event["hit_group"] == "chest":
-                        hitbox_distribution["chest"] += 1 
-                    elif event["hit_group"] == "stomach":
-                        hitbox_distribution["stomach"] += 1
-                    elif "left" in event["hit_group"] or "right" in event["hit_group"]:
-                        hitbox_distribution["limbs"] += 1
-
+    
         hs_percentage = round((total_headshots / current_kills), 2) * 100
         dmg_dealt = sum(dmg_list)
         avg_dmg = round((sum(dmg_list) / len(dmg_list)), 1) 
@@ -527,7 +521,22 @@ def get_weapon_data():
 
         per_weapon_stats.append(weaponStats)
 
+    for event in kill_events:
+        if event["hit_group"] == "chest":
+            hitbox_distribution["chest"] += 1 
+        elif event["hit_group"] == "stomach":
+            hitbox_distribution["stomach"] += 1
+        elif "left" in event["hit_group"] or "right" in event["hit_group"]:
+            hitbox_distribution["limbs"] += 1
+        elif event["hit_group"] == "head":
+            hitbox_distribution["head"] += 1
+
     overall_hs_percentage = round((overall_hs / len(kill_events)), 2) * 100 
+
+    hitbox_distribution["head"] = round((hitbox_distribution["head"] / len(kill_events)) * 100, 2);
+    hitbox_distribution["chest"] = round((hitbox_distribution["chest"] / len(kill_events)), 2);
+    hitbox_distribution["limbs"] = round((hitbox_distribution["limbs"] / len(kill_events)), 2);
+    hitbox_distribution["stomach"] = round((hitbox_distribution["stomach"] / len(kill_events)), 2);
 
     return per_weapon_stats, overall_hs_percentage, hitbox_distribution
 

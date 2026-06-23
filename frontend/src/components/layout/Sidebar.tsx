@@ -33,7 +33,7 @@ export default function Sidebar() {
 									</div>
 								</NavLink>
 							</li>
-							<li id='sidebar-heatmaps-icon'>
+							<li id='sidebar-heatmaps-icon' className='hidden'>
 								<NavLink to={'/heatmaps'}> 
 									<div className={`flex justify-center items-center sidebar-icon w-12 h-12 rounded-md mt-2 hover:cursor-pointer hover:bg-navy transition-all ease-in-out duration-300 ${currentLocation.pathname=='/heatmaps' ? 'bg-active' : 'bg-elevated'}`}>
 										<IconFlameFilled size={24} stroke={1} className={`mx-auto text-text2`}/>

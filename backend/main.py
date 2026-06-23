@@ -534,9 +534,9 @@ def get_weapon_data():
     overall_hs_percentage = round((overall_hs / len(kill_events)), 2) * 100 
 
     hitbox_distribution["head"] = round((hitbox_distribution["head"] / len(kill_events)) * 100, 2);
-    hitbox_distribution["chest"] = round((hitbox_distribution["chest"] / len(kill_events)), 2);
-    hitbox_distribution["limbs"] = round((hitbox_distribution["limbs"] / len(kill_events)), 2);
-    hitbox_distribution["stomach"] = round((hitbox_distribution["stomach"] / len(kill_events)), 2);
+    hitbox_distribution["chest"] = round((hitbox_distribution["chest"] / len(kill_events)) * 100, 2);
+    hitbox_distribution["limbs"] = round((hitbox_distribution["limbs"] / len(kill_events)) * 100, 2);
+    hitbox_distribution["stomach"] = round((hitbox_distribution["stomach"] / len(kill_events)) * 100, 2);
 
     return per_weapon_stats, overall_hs_percentage, hitbox_distribution
 

@@ -47,3 +47,8 @@
 .weapon-list-stat:not(:last-child, :first-child) {
 	margin-right: 40px;
 }
+
+.match-history-item:not(:last-child) {
+	border: 1px solid;
+	border-color: #1a2535;
+}

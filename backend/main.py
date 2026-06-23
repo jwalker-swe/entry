@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 from db import get_connection
 from app import ingest_demos
+import sqlite3
 from config import PLAYER_NAME, COMPARE_AGAINST_LAST
 from stats import calculate_kda, calculate_hsPercentage, calculate_adr, get_per_match_kills, calculate_ast, compare_stat 
 
@@ -17,6 +18,71 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def get_per_match_kill_events(matches, kill_events):
+    per_match_kill_events = []
+    for match in matches:
+        current_demo_id = match["demo_id"]
+        current_match_kill_events = []
+
+        for event in kill_events:
+            if event["demo_id"] == current_demo_id:
+                current_match_kill_events.append(event)
+
+        per_match_kill_events.append(current_match_kill_events)
+
+    return per_match_kill_events
+
+def get_match_history_stats(matches, per_match_kill_events):
+    match_history_stats = []
+
+    for index, match in enumerate(matches):
+        current_map_name = match["map_name"]
+        current_result = match["match_status"]
+        current_total_rounds = match["total_rounds"]
+        current_rounds_won = match["ct_round_wins"] + match["t_round_wins"]
+        current_rounds_loss = match["ct_round_losses"] + match["t_round_losses"]
+        current_total_kills = 0 
+        current_total_deaths = 0 
+        current_total_assists = 0 
+        current_total_dmg = 0 
+        current_total_hs = 0 
+        current_kd = 0 
+        current_adr = 0 
+        current_hs_percentage = 0 
+        current_kast = calculate_ast([match], [per_match_kill_events[index]])
+        print(f"kast: {current_kast}")
+
+        for event in per_match_kill_events[index]:
+            if event["attacker_name"] == PLAYER_NAME:
+                current_total_kills += 1 
+                current_total_dmg += event["dmg_dealt"]
+
+                if event["headshot"] == 1:
+                    current_total_hs += 1
+
+            if event["attacked_name"] == PLAYER_NAME:
+                current_total_deaths += 1
+
+        current_score = f"{current_rounds_won}-{current_rounds_loss}"
+
+        current_adr = round(current_total_dmg / current_total_rounds, 1)
+        current_hs_percentage = round((current_total_hs / current_total_kills) * 100, 0)
+        current_kd = round((current_total_kills / current_total_deaths), 2)
+
+        match_history = {
+            'map_name': current_map_name,
+            'match_result': current_result,
+            'match_score': current_score,
+            'kd': current_kd,
+            'adr': current_adr,
+            'hs_percentage': current_hs_percentage,
+            'kast': current_kast,
+        }
+
+        match_history_stats.append(match_history)
+
+    return match_history_stats
+        
 
 
 @app.get("/stats/summary")
@@ -544,4 +610,30 @@ def get_map_performance():
 
     return per_map_performance
 
+@app.get('/stats/match-history')
+def get_match_history():
+    conn = get_connection()
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
 
+    cursor.execute("""
+        SELECT * 
+        FROM matches
+    """)
+
+    matches = [dict(r) for r in cursor.fetchall()]
+
+    cursor.execute("""
+        SELECT * 
+        FROM kill_events
+        WHERE attacked_name == ? or attacker_name == ? or assister_name == ?
+    """, (PLAYER_NAME, PLAYER_NAME, PLAYER_NAME,) )
+
+    kill_events = [dict(r) for r in cursor.fetchall()]
+
+    per_match_kill_events = get_per_match_kills(matches, kill_events)
+
+    match_history_stats = get_match_history_stats(matches, per_match_kill_events)
+
+
+    return match_history_stats    

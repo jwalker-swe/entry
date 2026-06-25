@@ -1,8 +1,22 @@
 # CS2 Demo Stat Tracker
 
-> ⚠️ **Work in progress** — this project is in active development. Backend ingestion and core stat API are functional, and the React dashboard is currently being built.
-
 A personal CS2 statistics tracker that parses match demo files to extract and visualise performance data. The goal is to track kills, deaths, damage, and positional data across matches and display them in a modern web dashboard.
+
+---
+
+## Screenshots & Demos
+
+### Overview
+![Overview](docs/overview.png)
+
+### Maps
+![Match Review](docs/maps.png)
+
+### Weapons
+![Weapons](docs/weapons.png)
+
+### Demo
+![Demo](docs/entry-demo-001.gif)
 
 ---
 
@@ -14,18 +28,6 @@ A personal CS2 statistics tracker that parses match demo files to extract and vi
 - **Match History:** Persistent storage using SQLite.
 - **Automated Pipeline:** Automatic ingestion and cleanup of demo files.
 - **Modern Dashboard:** React-based frontend with interactive charts (WIP).
-
----
-
-## Current Status
-
-| Module | Status | Technology |
-|---|---|---|
-| **Backend API** | ✅ Functional | FastAPI, Python |
-| **Demo Parser** | ✅ Functional | demoparser2, Pandas |
-| **Database** | ✅ Functional | SQLite |
-| **Ingestion Pipeline** | ✅ Functional | Watcher/Script |
-| **Frontend Dashboard**| 🏗️ In Progress | React, TypeScript, Tailwind CSS |
 
 ---
 
@@ -59,16 +61,20 @@ entry/
    ```bash
    cd backend
    ```
-2. **Install dependencies**
+2. **Create and activate a virtual environment**
+   ```bash
+   python -m venv .venv && source .venv/bin/activate
+   ```
+3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
-3. **Configure `config.py`**
+4. **Configure `config.py`**
    ```python
    PLAYER_NAME = "YourName"
    DEMO_DIRECTORY = "/path/to/your/demos"
    ```
-4. **Run the API server**
+5. **Run the API server**
    ```bash
    fastapi dev main.py
    ```
@@ -87,8 +93,13 @@ entry/
    ```bash
    npm run dev
    ```
+4. Open http://localhost:5173 in your browser. The backend must be running for data to load.
 
 ---
+
+## Ingesting a Demo
+
+Drop any CS2 .dem or .dem.bz2 file into the demos/directory. The backend will detect it, part it, store the results in SQLite, and delete the file when done. An example demo is included in docs/ if you want to verify the setup.
 
 ## Stat Definitions
 
@@ -105,3 +116,4 @@ entry/
 - [FastAPI](https://fastapi.tiangolo.com/) — Backend framework
 - [Vite](https://vitejs.dev/) & [React](https://reactjs.org/) — Frontend stack
 - [Tailwind CSS](https://tailwindcss.com/) — Styling
+- [Recharts](https://recharts.org/) & [D3](https://d3js.org/) — Charts
